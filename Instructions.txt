@@ -1,0 +1,45 @@
+******** jsoncpp
+sudo apt-get install libjsoncpp-dev
+
+#include <jsoncpp/json/value.h>
+#include <jsoncpp/json/json.h>
+
+Flag : -ljsoncpp
+
+******** rapidjson
+sudo apt-get install rapidjson-dev 
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+
+using namespace rapidjson ;
+
+******** opencv
+git clone https://github.com/opencv/opencv.git
+cd ~/opencv && mkdir release && cd release
+cmake -D CMAKE_BUILD_TYPE=Release -D GLIBCXX_USE_CXX11_ABI=0 -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make
+sudo make install
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <experimental/filesystem>
+
+using namespace cv ;
+
+Flags : -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
+
+******** matplotlibcpp
+sudo apt-get update
+sudo apt-get install build-essential checkinstall
+sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
+cd /usr/src
+sudo -s
+wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+sudo tar xzf Python-2.7.18.tgz
+cd Python-2.7.18
+sudo ./configure --enable-optimizations
+sudo make altinstall
+
+Flags : -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
