@@ -42,11 +42,11 @@ class Bibliotheque{
         void Sauvegarder() ;                                                // Sauvegarder une bibliotheque
 
         /*Methodes supplementaires*/
-        void SaisirDate(string& jour, string& mois, string& annee) ;        // Saisir et valider la date
+        string SaisirDate(string& jour, string& mois, string& annee) ;      // Saisir et valider la date
         bool Continuer() ;                                                  // Continuer [Y/N]
         void VerifierExtension(string& nom) ;                               // Verifier l'extension ".json"
         Json::Value TriElement(const string critere) ;                      // Tri elementaire
-        bool VerifierNumero(int& numero) ;                                  // Verifier l'existance d'un numero de l'image
+        bool VerifierNumero(int& numero, const Json::Value biblio) ;        // Verifier l'existance d'un numero de l'image
         bool VerifierBibliotheque() ;                                       // Veriffier bibliotheque vide ou invalide
 };
 

@@ -5,7 +5,7 @@ Image::Image()
     int nb ;                                                                    // Numero de l'image
     Json::Value images ;
     Json::Reader reader ;
-    ifstream bibliotheque_file("../DATA/Bibliotheques/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
+    ifstream bibliotheque_file("../DATA/Bibliothèques/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
     reader.parse(bibliotheque_file, images) ;                                   // Importer le contenu a l'objet Json
 
     cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
@@ -67,9 +67,9 @@ Image::Image(string chemin)
             // Saisir un autre chemin
             cout << "Fichier non exist" << endl ;
             if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliotheques/" << endl ;
+                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliothèques/" << endl ;
                 cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/Bibliotheques/" + chemin ;                     // Completer le chemin
+                chemin = "./DATA/Bibliothèques/" + chemin ;                     // Completer le chemin
                 decision = 'Y' ;                                 
             }
         }
@@ -111,14 +111,15 @@ Image::Image(string chemin, int num){
             // Saisir un autre chemin
             cout << "Fichier non exist" << endl ;
             if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliotheques/" ;
+                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliothèques/" ;
                 cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/Bibliotheques/" + chemin ;                     // Completer le chemin
+                chemin = "./DATA/Bibliothèques/" + chemin ;                     // Completer le chemin
                 decision = 'Y' ;
             }
         }
     }while(decision == 'Y') ;    
 }
+
 Image::Image(Bibliotheque objBiblio,int numImage){
     Json::Value biblioJson = objBiblio.getBilbiotheque();
     _cheminAccesContenu = biblioJson["images"][numImage]["cheminAcces"].asString() ;
@@ -287,13 +288,13 @@ void Image::ModifierDescripteurImage(){
             // Chemin
             case 1 :
                 // Saisir le nouveau chemin
-                cout << "Veuillez saisir le nouveau chemin : ./DATA/" ;
+                cout << "Veuillez saisir le nouveau chemin : ./DATA/Images/" ;
                 do{
                     cin >> nouveauTexte ;
-                    nouveauTexte = "./DATA/" + nouveauTexte ;                       // Completer le chemin
+                    nouveauTexte = "./DATA/Images/" + nouveauTexte ;                       // Completer le chemin
                     validation = experimental::filesystem::exists(nouveauTexte) ;   // Verifier l'existace du fichier
                     if(validation == false){
-                        cout << "Ce fichier n'existe pas. Veuillez saisir un nouveau nom valide : ./DATA/" ;
+                        cout << "Ce fichier n'existe pas. Veuillez saisir un nouveau nom valide : ./DATA/Images/" ;
                     }
                 }while(validation == false) ;
 
@@ -467,7 +468,6 @@ void Image::TraitementImage(){
 }
 
 /*Methodes supplementaires*/
-
 /*Verifier l'extension ".json"*/
 void Image::VerifierExtension(string& nom){
     if (nom.length() < 6){                                          // Si la longueur du nom est < 6 (".json" = 5 caracteres)
@@ -500,16 +500,16 @@ bool Image::Continuer(){
 }
 
 /*Verifier l'existance du numero d'image*/
-bool Image::VerifierNumero(int& numero, const Json::Value images){
+bool Image::VerifierNumero(int& numero, const Json::Value biblio){
     // Declaration des variables
     int c ;                                             // Indice
     bool exist ;                                        // Verificaiton de l'existance du numero saisi
-    int nbImages = images["nbImages"].asInt() ;         // Nombre d'images existantes dans la bibliotheque
+    int nbImages = biblio["nbImages"].asInt() ;         // Nombre d'images existantes dans la bibliotheque
      
     // Verification de l'existance du numero saisi dans la bibliotheque
     for (c = 0 ; c < nbImages ; c++){
         // Si le numero existe
-        if (numero == images["images"][c]["numero"].asInt()){
+        if (numero == biblio["images"][c]["numero"].asInt()){
             exist = true ;
         }
     }

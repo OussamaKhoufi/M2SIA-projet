@@ -49,7 +49,8 @@ class Image{
 		Image(string chemin) ;											// Constructeur avec un chemin d'acces a la bibliotheque donne
 		Image(string chemin, int num) ;									// Constructeur avec un chemin d'acces a la bibliotheque et un numero de l'image donnes
 		Image(Bibliotheque objBiblio,int numImage);
-        /*Getter*/
+        
+		/*Getter*/
         string getCheminAccesContenu() const ;      										// Chemin d'acces
 		string getSource() const ;                  										// Source
 		string getTitre() const ;                   										// Titre
@@ -82,7 +83,7 @@ class Image{
 		/*Methodes supplementaires*/					
 		void VerifierExtension(string& nom) ;												// Verifier l'extension ".json"
 		bool Continuer() ;																	// Continuer [Y/N]
-		bool VerifierNumero(int& numero, const Json::Value images) ;						// Verifier l'existance du numero d'image 
+		bool VerifierNumero(int& numero, const Json::Value biblio) ;						// Verifier l'existance du numero d'image 
 		string SaisirDate(string& jour, string& mois, string& annee) ;						// Saisir une date
 		void ExtraireDate(const string date, string& jour, string& mois, string& annee) ;	// Extraire jour, mois, annee a partir d'une date
 		

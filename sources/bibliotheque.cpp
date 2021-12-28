@@ -102,7 +102,7 @@ void Bibliotheque::AfficherCout(){
         cin >> numeroSaisie ; 
 
         // Verification de l'existance du numero saisi dans la bibliotheque
-        if (VerifierNumero(numeroSaisie)){
+        if (VerifierNumero(numeroSaisie, getBilbiotheque())){
             for(c = 0 ; c < nbImages ; c++){
                 // Chercher l'image ayant le numero correspondant
                 if(biblio["images"][c]["numero"].asInt() == numeroSaisie){
@@ -378,15 +378,15 @@ void Bibliotheque::AjouterImage(){
         biblio["images"][indice]["acces"] = texte ;
 
         // Saisie : Chemin acces
-        cout << "Chemin d'acces : ./DATA/" ;
+        cout << "Chemin d'acces : ./DATA/Images/" ;
         do{
             cin >> texte ;
-            texte = "./DATA/" + texte ;
+            texte = "./DATA/Images/" + texte ;
             // Verifier l'existance du fichier
             exist = experimental::filesystem::exists(texte) ; 
             // Si le fichier n'existe pas
             if(exist == false){
-                cout << "Ce fichier n'existe pas. Veuillez saisir un nom valide : ./DATA/" ;
+                cout << "Ce fichier n'existe pas. Veuillez saisir un nom valide : ./DATA/Images/" ;
             }
         }while (exist == false) ;
         biblio["images"][indice]["cheminAcces"] = texte ;
@@ -397,15 +397,14 @@ void Bibliotheque::AjouterImage(){
         biblio["images"][indice]["cout"] = nbReel ;
 
         // Saisie : Date de creation
-        cout << "Date de creation : " ;
-        SaisirDate(jourCreation, moisCreation, anneeCreation) ;
-        texte = jourCreation + "/" + moisCreation + "/" + anneeCreation ;
+        cout << "Date de creation (dd/mm/yyyy) : " ;
+        texte = SaisirDate(jourCreation, moisCreation, anneeCreation) ;
         biblio["images"][indice]["dateCreation"] = texte ;
 
         // Saisie : Date d'ajout
         do{  
-            cout << "Date d'ajout : " ;
-            SaisirDate(jourAjout, moisAjout, anneeAjout) ;
+            cout << "Date d'ajout (dd/mm/yyyy) : " ;
+            texte = SaisirDate(jourAjout, moisAjout, anneeAjout) ;
             // Si la date d'ajout est superieure ou egale a la date de creation
             if((stoi(anneeAjout + moisAjout + jourAjout) - stoi(anneeCreation + moisCreation + jourCreation)) < 0){
                 cout << "La date d'ajout doit etre superieure ou egale a la date de creation. Veuillez reessayer." << endl ;
@@ -415,7 +414,6 @@ void Bibliotheque::AjouterImage(){
             }
         }while(valideDate == false) ;
         
-        texte = jourAjout + "/" + moisAjout + "/" + anneeAjout ;
         biblio["images"][indice]["dateAjout"] = texte ;
 
         // Numero de l'image
@@ -469,12 +467,9 @@ void  Bibliotheque::SupprimerImage(){
         cout << "Entrez le numero de l'image a supprimer"<< endl ;
         cin >> numero ;
 
-
-
-
         // Verifier l'existance du numero saisi
-        VerifierNumero(numero) ;
-        if(VerifierNumero(numero)){
+        VerifierNumero(numero, getBilbiotheque()) ;
+        if(VerifierNumero(numero, getBilbiotheque())){
             int indexImage = 0 ;
             for(const auto & obj : biblio["images"]) {
                 if (obj["numero"] == numero) {
@@ -524,12 +519,17 @@ void Bibliotheque::Sauvegarder(){
 }
 
 /*Saisie et validation de la date*/
-void Bibliotheque::SaisirDate(string& jour, string& mois, string& annee){
+string Bibliotheque::SaisirDate(string& jour, string& mois, string& annee){
     // Declaration de variable
-    bool valideDate = true ;
+    bool valideDate = true ;            // Validation de la date
+    string date ;
+
+    // Initialisation
+    jour.clear() ;
+    mois.clear() ;
+    annee.clear() ;   
 
     // Saisie et verification
-    cout << "Veuilez saisir une date (dd/mm/yyyy) : " ;
     do{
         // Saisie - Jour
         getline(cin, jour, '/') ;
@@ -570,6 +570,11 @@ void Bibliotheque::SaisirDate(string& jour, string& mois, string& annee){
             valideDate = false ;
         }
     }while(valideDate == false) ;
+
+    // Generer la date
+    date = jour + "/" + mois + "/" + annee ;
+
+    return date ;
 }
 
 /*Continuer [Y/N]*/
@@ -679,11 +684,11 @@ Json::Value Bibliotheque::TriElement(const string critere){
 }
 
 /*Verifier l'existance d'un numero de l'image*/
-bool Bibliotheque::VerifierNumero(int& numero){
+bool Bibliotheque::VerifierNumero(int& numero, const Json::Value biblio){
     // Declaration des variables
-    int c ;                                                 // Indice
-    bool exist ;                                            // Verificaiton de l'existance du numero saisi
-    int nbImages = getBilbiotheque()["nbImages"].asInt() ;  // Nombre d'images existantes dans la bibliotheque
+    int c ;                                         // Indice
+    bool exist ;                                    // Verificaiton de l'existance du numero saisi
+    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images existantes dans la bibliotheque
      
     // Verification de l'existance du numero saisi dans la bibliotheque
     for (c = 0 ; c < nbImages ; c++){
