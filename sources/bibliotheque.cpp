@@ -469,15 +469,23 @@ void  Bibliotheque::SupprimerImage(){
         cout << "Entrez le numero de l'image a supprimer"<< endl ;
         cin >> numero ;
 
+
+
+
         // Verifier l'existance du numero saisi
         VerifierNumero(numero) ;
         if(VerifierNumero(numero)){
-            // Supprésion dans le vecteur images des élèment associer à ce numéro
-            biblio["images"].removeIndex(numero-1, &removed);
-
-            // Mise à Jour sur le nombre d'image.
-            biblio["nbImages"] = nbImages - 1 ;
-            cout << biblio << endl ;
+            int indexImage = 0 ;
+            for(const auto & obj : biblio["images"]) {
+                if (obj["numero"] == numero) {
+                    // Supprésion dans le vecteur images des élèment associer à ce numéro
+                    biblio["images"].removeIndex(indexImage, &removed);
+                    // Mise à Jour sur le nombre d'image.
+                    biblio["nbImages"] = nbImages - 1 ;
+                }
+                //Incrémenter l'index Images
+                indexImage++;
+            }
             
             // Mise à jour de la bibliothèque
             setBilbiotheque(biblio);
