@@ -20,7 +20,7 @@ using namespace std ;
 class Bibliotheque{
     private :      
         Json::Value _bibliotheque ;                                         // Objet de type Json
-
+        string _cheminJson;
     public :
         /*Constructeurs*/
         Bibliotheque() ;                                                    // Constructeur vide 
@@ -28,6 +28,7 @@ class Bibliotheque{
         Bibliotheque(const Json::Value bibliotheque) ;                      // Constructeur avec un objet Json
         /*Getter*/
         Json::Value getBilbiotheque() const ;
+        string getCheminJson() const;
         /*Setter*/
         void setBilbiotheque(const Json::Value bibliotheque) ;
 

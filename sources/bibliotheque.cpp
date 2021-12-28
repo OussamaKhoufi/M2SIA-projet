@@ -1,4 +1,4 @@
-#include "./../headers/bibliotheque.h"
+#include "../headers/bibliotheque.h"
 
 /*Constructeur vide*/
 Bibliotheque::Bibliotheque(){
@@ -13,7 +13,7 @@ Bibliotheque::Bibliotheque(){
     // Verifier l'extension ".json"
     VerifierExtension(nomNew) ;
 
-    nomNew = "./DATA/" + nomNew ;
+    nomNew = "./DATA/Bibliothèques/" + nomNew ;
     exist = experimental::filesystem::exists(nomNew) ;  
 
     // Vérifier l'existance ou non du fichier
@@ -33,6 +33,7 @@ Bibliotheque::Bibliotheque(){
         cout << "Fichier inexistant. Generer une nouvelle bibliotheque." << endl ;
         AjouterImage() ;
     }
+    _cheminJson = nomNew;
 }
 
 /*Constructeur avec le nom de la bibliotheque donnee par l'utilisateur*/
@@ -42,12 +43,13 @@ Bibliotheque::Bibliotheque(string nom){
 
     // Verifier l'extension ".json"
     VerifierExtension(nom) ;
-    nom = "./DATA/" + nom ;
+    nom = "./DATA/Bibliothèques/" + nom ;
     cout << nom << endl ;
 
     // Lecture du fichier et copie du contenu dans la bibliotheque
     ifstream bibliothequeFile(nom, ios::in) ;   // Chargement du fichier Json
-    reader.parse(bibliothequeFile, _bibliotheque) ;                
+    reader.parse(bibliothequeFile, _bibliotheque) ; 
+    _cheminJson = nom;                
 }
 
 /*Constructeur avec un objet Json*/
@@ -59,7 +61,7 @@ Bibliotheque::Bibliotheque(const Json::Value bibliotheque){
 Json::Value Bibliotheque::getBilbiotheque() const{
     return _bibliotheque ;
 }
-
+string Bibliotheque::getCheminJson() const { return _cheminJson; }
 /*Setter*/
 void Bibliotheque::setBilbiotheque(const Json::Value bibliotheque){
     _bibliotheque = bibliotheque ;
@@ -496,7 +498,7 @@ void Bibliotheque::Sauvegarder(){
  
     cin >> nomNew ; 
     VerifierExtension(nomNew) ;
-    nomNew = "./DATA/" + nomNew ;
+    nomNew = "./DATA/Bibliothèques/" + nomNew ;
     exist = experimental::filesystem::exists(nomNew) ;
     if(exist){
         cout << "Ce fichier existe deja. Le sauvegardement va ecraser le fichier existant." << endl ;

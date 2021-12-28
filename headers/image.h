@@ -19,12 +19,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <experimental/filesystem>
-// Plot
-// #include <matplot/matplot.h>
-#include "./../headers/matplotlibcpp.h"
-namespace plt = matplotlibcpp ;
 
-using namespace plt ;
+#include "../headers/bibliotheque.h"
 using namespace std ;
 using namespace rapidjson ;
 using namespace cv ;
@@ -47,7 +43,7 @@ class Image{
         Image();														// Constructeur vide
 		Image(string chemin) ;											// Constructeur avec un chemin d'acces a la bibliotheque donne
 		Image(string chemin, int num) ;									// Constructeur avec un chemin d'acces a la bibliotheque et un numero de l'image donnes
-
+		Image(Bibliotheque objBiblio,int numImage);
         /*Getter*/
         string getCheminAccesContenu() const ;      										// Chemin d'acces
 		string getSource() const ;                  										// Source

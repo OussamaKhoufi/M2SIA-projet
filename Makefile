@@ -21,13 +21,13 @@ binaries = main.o image.o bibliotheque.o exec_main
 all: clean $(binaries)
 
 exec_main : main.o image.o bibliotheque.o
-	g++ -o exec_main main.o bibliotheque.o image.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
+	g++ -o exec_main main.o bibliotheque.o image.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 
 main.o : ./sources/main.cpp 
-	g++ -c ./sources/main.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
+	g++ -c ./sources/main.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
 
 image.o : ./sources/image.cpp ./headers/image.h
-	g++ -c ./sources/image.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
+	g++ -c ./sources/image.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
 
 bibliotheque.o : ./sources/bibliotheque.cpp ./headers/bibliotheque.h
 	g++ -c ./sources/bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs

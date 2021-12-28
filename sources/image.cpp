@@ -1,7 +1,6 @@
-#include "./../headers/image.h"
+#include "../headers/image.h"
 
-Image::Image()
-{
+Image::Image(){
     int nb ;                                                                    // Numero de l'image
     Json::Value images ;
     Json::Reader reader ;
@@ -120,6 +119,18 @@ Image::Image(string chemin, int num){
     }while(decision == 'Y') ;    
 }
 
+Image::Image(Bibliotheque objBiblio,int numImage){
+    _cheminAccesContenu = objBiblio.getBilbiotheque()["images"][numImage]["cheminAcces"].asString() ;
+    _source = objBiblio.getBilbiotheque()["images"][numImage]["source"].asString() ;
+    _titre = objBiblio.getBilbiotheque()["images"][numImage]["titre"].asString() ;
+    _numero = objBiblio.getBilbiotheque()["images"][numImage]["numero"].asInt() ;
+    _cout = objBiblio.getBilbiotheque()["images"][numImage]["cout"].asDouble() ;
+    _acces = objBiblio.getBilbiotheque()["images"][numImage]["acces"].asString() ;
+    _dateAjout = objBiblio.getBilbiotheque()["images"][numImage]["dateAjout"].asString() ;
+    _dateCreation = objBiblio.getBilbiotheque()["images"][numImage]["dateCreation"].asString() ;
+    _cheminJson = objBiblio.getCheminJson() ;
+    _numeroJson = numImage ;
+}
 /*Getter*/
 // Chemin d'acces
 string Image::getCheminAccesContenu() const {
@@ -441,9 +452,6 @@ void Image::TraitementImage(){
     Mat image_NoirBlanc ;                                                           // Image Noir et Blanc
     Mat image_channels[3] ;                                                         // Canaux de l'image
     Mat filtre = (Mat_<double>(3,3) << 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11) ;
-
-    plot({1,3,2,4});
-    show();
 
     split(image, image_channels) ;
     Mat imageConv = ImageConvolution(image_channels[0], filtre) ;
@@ -792,34 +800,6 @@ void Image::ExtraireDate(const string date, string& jour, string& mois, string& 
     annee.push_back(date.at(8)) ;
     annee.push_back(date.at(9)) ;    
 }
-
-/*Histogramme*/
-vector<int> Image::ImageHistogramme(const Mat image){
-    // Declaration des variables
-    int nbIntervalle = 100 ;                    // Nombre d'intervalles
-    int c, ligne, colonne ;                     // Indices
-    vector<int> occurence(nbIntervalle) ;       // Vecteur des occurences
-
-    // Initialisation
-    for(c = 0 ; c < nbIntervalle ; c++){
-        occurence[c] = 0 ;
-    }
-
-    // Determiner le nombre d'occurences de chaque intervalle
-    for(c = 0 ; c < nbIntervalle - 1 ; c++){
-        for(ligne = 0 ; ligne < image.size().height ; ligne++){
-            for(colonne = 0 ; colonne < image.size().width ; colonne++){
-                if((image.at<unsigned char>(ligne, colonne) >= ((float)255/nbIntervalle*c)) && (image.at<unsigned char>(ligne, colonne) < ((float)255/nbIntervalle*(c+1)))){
-                    occurence[c]++ ;
-                }
-            }
-        }
-    }
-
-    // Retour
-    return occurence ;
-}
-
 
 /*
             do{
