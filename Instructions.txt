@@ -52,3 +52,6 @@ $ cat ~/.ssj/id_rsa.pub
 
 ****** Git *******
 https://education.github.com/git-cheat-sheet-education.pdf
+
+
+*****************************
