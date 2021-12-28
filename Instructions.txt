@@ -30,28 +30,22 @@ using namespace cv ;
 
 Flags : -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 
-******** matplotlibcpp
-sudo apt-get update
-sudo apt-get install build-essential checkinstall
-sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
-cd /usr/src
-sudo -s
-wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-sudo tar xzf Python-2.7.18.tgz
-cd Python-2.7.18
-sudo ./configure --enable-optimizations
-sudo make altinstall
-
-Flags : -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
-
 ****** Generate an ssh key************ 
 $ ssh-keygen -t rsa -b 2048 -C "exemple@email.com"
 ==> Appuyer sur entrer 3 fois  
-$ cat ~/.ssj/id_rsa.pub 
+$ cat ~/.ssh/id_rsa.pub 
 ==> Copier la clé ssh
 
 ****** Git *******
 https://education.github.com/git-cheat-sheet-education.pdf
 
-
-*****************************
+**** mettre a jour le projet localement ****
+$ git pull 
+**** mettre à jour un fichier sur github ***
+$ git add nomdufichier
+$ git commit -m "message"
+$ git push  
+*** git config ***
+$ git config --global user.name “YourName”
+$ git config --global user.email “exemple@gmail.com”
+$ git config --global color.ui auto
