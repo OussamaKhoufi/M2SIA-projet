@@ -1,10 +1,11 @@
-#include "../headers/image.h"
+#include "./../headers/image.h"
 
-Image::Image(){
+Image::Image()
+{
     int nb ;                                                                    // Numero de l'image
     Json::Value images ;
     Json::Reader reader ;
-    ifstream bibliotheque_file("../DATA/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
+    ifstream bibliotheque_file("../DATA/Bibliotheques/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
     reader.parse(bibliotheque_file, images) ;                                   // Importer le contenu a l'objet Json
 
     cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
@@ -66,9 +67,9 @@ Image::Image(string chemin)
             // Saisir un autre chemin
             cout << "Fichier non exist" << endl ;
             if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : ./DATA/" << endl ;
+                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliotheques/" << endl ;
                 cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/" + chemin ;                                   // Completer le chemin
+                chemin = "./DATA/Bibliotheques/" + chemin ;                     // Completer le chemin
                 decision = 'Y' ;                                 
             }
         }
@@ -110,27 +111,15 @@ Image::Image(string chemin, int num){
             // Saisir un autre chemin
             cout << "Fichier non exist" << endl ;
             if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : " << endl ;
+                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliotheques/" ;
                 cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/" + chemin ;                                   // Completer le chemin
+                chemin = "./DATA/Bibliotheques/" + chemin ;                     // Completer le chemin
                 decision = 'Y' ;
             }
         }
     }while(decision == 'Y') ;    
 }
 
-Image::Image(Bibliotheque objBiblio,int numImage){
-    _cheminAccesContenu = objBiblio.getBilbiotheque()["images"][numImage]["cheminAcces"].asString() ;
-    _source = objBiblio.getBilbiotheque()["images"][numImage]["source"].asString() ;
-    _titre = objBiblio.getBilbiotheque()["images"][numImage]["titre"].asString() ;
-    _numero = objBiblio.getBilbiotheque()["images"][numImage]["numero"].asInt() ;
-    _cout = objBiblio.getBilbiotheque()["images"][numImage]["cout"].asDouble() ;
-    _acces = objBiblio.getBilbiotheque()["images"][numImage]["acces"].asString() ;
-    _dateAjout = objBiblio.getBilbiotheque()["images"][numImage]["dateAjout"].asString() ;
-    _dateCreation = objBiblio.getBilbiotheque()["images"][numImage]["dateCreation"].asString() ;
-    _cheminJson = objBiblio.getCheminJson() ;
-    _numeroJson = numImage ;
-}
 /*Getter*/
 // Chemin d'acces
 string Image::getCheminAccesContenu() const {
@@ -449,20 +438,18 @@ void Image::ModifierDescripteurImage(){
 /*Traitement de l'image*/
 void Image::TraitementImage(){
     Mat image = imread(getCheminAccesContenu()) ;                                   // Charger l'image
-    Mat image_NoirBlanc ;                                                           // Image Noir et Blanc
     Mat image_channels[3] ;                                                         // Canaux de l'image
-    Mat filtre = (Mat_<double>(3,3) << 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11) ;
+    Mat filtre = (Mat_<double>(3,3) << 1, 1, 1, 1, 1, 1, 1, 1, 1) ;
+    filtre = filtre/9 ;
 
-    split(image, image_channels) ;
-    Mat imageConv = ImageConvolution(image_channels[0], filtre) ;
+    Mat imageConv = ImageConvolution(image, filtre) ;
+    Mat image_NoirBlanc = ImageNiveauGris(image) ;
 
-    // Calculer la moyenne des 3 canaux
-    image_NoirBlanc = (image_channels[0] + image_channels[1] + image_channels[2])/3 ;
     // Affichage
-    namedWindow("Image Noir et Blanc") ; 
+    /*namedWindow("Image Noir et Blanc") ; 
     imshow("Image Noir et Blanc", imageConv);  
     waitKey(0) ; 
-    destroyWindow("Image Noir et Blanc") ;
+    destroyWindow("Image Noir et Blanc") ;*/
 }
 
 /*Methodes supplementaires*/
@@ -630,8 +617,8 @@ Mat Image::ImageMiroir(const Mat image, const Mat filtre){
     return ImageMiroir ;
 }
 
-/*Produit de ImageConvolution*/
-Mat Image::ImageConvolution(const Mat image, const Mat filtre){
+/*Produit de convolution entre deux matrices*/
+Mat Image::MatriceConvolution(const Mat image, const Mat filtre){
     // Declaration des variables
     int ligne, colonne, lig, col ;                                  // Indices
     int L_image, C_image ;                                          // Dimensions de l'image
@@ -648,7 +635,7 @@ Mat Image::ImageConvolution(const Mat image, const Mat filtre){
     L_filtre = filtre.size().height ;                               // Nombre de lignes
     C_filtre = filtre.size().width ;                                // Nombre de colonnes
 
-    // Produit de ImageConvolution
+    // Produit de convolution
     for(ligne = 0 ; ligne <= L_image - 1 ; ligne++){                // Pour chaque ligne de l'image
         for(colonne = 0 ; colonne <= C_image - 1 ; colonne++){      // Pour chaque colonne de l'image
             val = 0 ;                                               // Remise a zero la variable intermediaire
@@ -800,6 +787,131 @@ void Image::ExtraireDate(const string date, string& jour, string& mois, string& 
     annee.push_back(date.at(8)) ;
     annee.push_back(date.at(9)) ;    
 }
+
+/*Histogramme*/
+vector<int> Image::ImageHistogramme(const Mat image){
+    // Declaration des variables
+    int nbIntervalle = 100 ;                    // Nombre d'intervalles
+    int c, ligne, colonne ;                     // Indices
+    vector<int> occurence(nbIntervalle) ;       // Vecteur des occurences
+
+    // Initialisation
+    for(c = 0 ; c < nbIntervalle ; c++){
+        occurence[c] = 0 ;
+    }
+
+    // Determiner le nombre d'occurences de chaque intervalle
+    for(c = 0 ; c < nbIntervalle - 1 ; c++){
+        for(ligne = 0 ; ligne < image.size().height ; ligne++){
+            for(colonne = 0 ; colonne < image.size().width ; colonne++){
+                if((image.at<unsigned char>(ligne, colonne) >= ((float)255/nbIntervalle*c)) && (image.at<unsigned char>(ligne, colonne) < ((float)255/nbIntervalle*(c+1)))){
+                    occurence[c]++ ;
+                }
+            }
+        }
+    }
+
+    // Retour
+    return occurence ;
+}
+
+/*Produit de convolution entre deux images*/
+Mat Image::ImageConvolution(const Mat image, const Mat filtre){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageConv ;                             // Image resultante
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    vector<Mat> imageConvComposante ;           // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+    
+    // Convolution sur tous les canaux de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageConvComposante.push_back(MatriceConvolution(imageComposante[c], filtre))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageConvComposante, imageConv) ;
+
+    // Retour
+    return imageConv ;
+}
+
+/*Convertir une image en niveau de gris*/
+Mat Image::ImageNiveauGris(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageGris ;                             // Image resultante
+    Mat imageDouble ;                           // Image convertie en type double
+
+    // Convertion en double
+    image.convertTo(imageDouble, CV_32FC3) ;
+
+    // Decomposition des composantes de couleur
+    split(imageDouble, imageComposante) ;
+
+    // Initialisation
+    imageGris = imageComposante[0] ;
+
+    // Calculs
+    for(c = 1 ; c < nbComposante ; c++){
+        imageGris += imageComposante[c] ;
+    }
+    imageGris = imageGris/3 ;
+
+    // Convertion en unsigned char
+    imageGris.convertTo(imageGris, CV_8U) ;
+
+    // Retour
+    return imageGris ;
+}
+
+/*Generer les filtres*/
+Mat Image::GenererFiltre(const int typeFiltre){
+    // Declaration de variable
+    Mat filtre ;
+    Mat filtreGradient[2] ;
+
+    switch (typeFiltre){
+    // Filtre moyenneur
+    case 1 :
+        filtre = (Mat_<double>(3,3) << 1, 1, 1, 1, 1, 1, 1, 1, 1) ;
+        filtre = filtre/9 ;
+        break ;
+    // Filtre laplacien
+    case 2 :
+        filtre = (Mat_<double>(3,3) << -1, -1, -1, -1, 8, -1, -1, -1, -1) ;
+        break ;
+    // Filtre gaussien
+    case 3 :
+        filtre = (Mat_<double>(3,3) << 1, 2, 1, 2, 4, 2, 1, 2, 1) ;
+        filtre = filtre/16 ;
+        break ;
+    // Filtre gradient en x (Sobel)
+    case 4 :
+        filtre = (Mat_<double>(3,3) << -1, -2, -1, 0, 0, 0, 1, 2, 1) ;
+        break ;
+    // Filtre gradient en y (Sobel)
+    case 5 :
+        filtre = (Mat_<double>(3,3) << -1, 0, 1, -2, 0, 2, -1, 0, 1) ;
+        break ;
+    default:
+        cout << "Type de filtre invalide." << endl ;
+        break;
+    }
+
+    // Retour
+    return filtre ;
+}
+
+/*Filtre median*/
+
+
+
 
 /*
             do{
