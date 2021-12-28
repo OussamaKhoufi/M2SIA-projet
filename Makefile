@@ -16,12 +16,12 @@
 #bibliotheque.o : bibliotheque.cpp bibliotheque.h
 #	g++ -c bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs
 
-binaries = main.o image.o bibliotheque.o exec_main
+binaries = main.o image.o bibliotheque.o exec_main.exe
 
 all: clean $(binaries)
 
-exec_main : main.o image.o bibliotheque.o
-	g++ -o exec_main main.o bibliotheque.o image.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
+exec_main.exe : main.o image.o bibliotheque.o
+	g++ -o exec_main.exe main.o bibliotheque.o image.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 
 main.o : ./sources/main.cpp 
 	g++ -c ./sources/main.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
