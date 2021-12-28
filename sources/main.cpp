@@ -15,7 +15,7 @@ void EntreePourContinuer(){
     cin.get();
 }
 void menuImage(Bibliotheque objBiblio,int numImage){
-	Image objImage(objBiblio,numImage);
+	Image objImage(objBiblio,numImage-1);
 	while(1){
 		int choix;
 		cout << endl << "---------------------------" << endl;
@@ -30,10 +30,13 @@ void menuImage(Bibliotheque objBiblio,int numImage){
 		cin >> choix;
 		switch (choix){
 			case 1:
+			objImage.AfficherContenuImage();
 			break;
 			case 2:
+			objImage.AfficherDescripteurImage();
 			break;
 			case 3:
+			objImage.TraitementImage();
 			break;
 			case 4:
 			break;
