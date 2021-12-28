@@ -43,3 +43,12 @@ sudo ./configure --enable-optimizations
 sudo make altinstall
 
 Flags : -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
+
+****** Generate an ssh key************ 
+$ ssh-keygen -t rsa -b 2048 -C "exemple@email.com"
+==> Appuyer sur entrer 3 fois  
+$ cat ~/.ssj/id_rsa.pub 
+==> Copier la clé ssh
+
+****** Git *******
+https://education.github.com/git-cheat-sheet-education.pdf
