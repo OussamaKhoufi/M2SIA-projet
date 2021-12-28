@@ -19,8 +19,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <experimental/filesystem>
+// Plot
+// #include <matplot/matplot.h>
+// #include "./../headers/matplotlibcpp.h"
+// namespace plt = matplotlibcpp ;
 
-#include "../headers/bibliotheque.h"
+// using namespace plt ;
 using namespace std ;
 using namespace rapidjson ;
 using namespace cv ;
@@ -43,7 +47,7 @@ class Image{
         Image();														// Constructeur vide
 		Image(string chemin) ;											// Constructeur avec un chemin d'acces a la bibliotheque donne
 		Image(string chemin, int num) ;									// Constructeur avec un chemin d'acces a la bibliotheque et un numero de l'image donnes
-		Image(Bibliotheque objBiblio,int numImage);
+
         /*Getter*/
         string getCheminAccesContenu() const ;      										// Chemin d'acces
 		string getSource() const ;                  										// Source
@@ -77,13 +81,16 @@ class Image{
 		/*Methodes supplementaires*/
 		Mat ImageZero(const int nbLigne, const int nbColonne) ; 							// Generer une matrice zero
 		Mat ImageMiroir(const Mat image, const Mat filtre) ;								// Effet miroir
-		Mat ImageConvolution(const Mat image, const Mat filtre) ;							// Produit de convolution
+		Mat MatriceConvolution(const Mat image, const Mat filtre) ;							// Produit de convolution entre deux matrices
 		void VerifierExtension(string& nom) ;												// Verifier l'extension ".json"
 		bool Continuer() ;																	// Continuer [Y/N]
 		bool VerifierNumero(int& numero, const Json::Value images) ;						// Verifier l'existance du numero d'image 
 		string SaisirDate(string& jour, string& mois, string& annee) ;						// Saisir une date
 		void ExtraireDate(const string date, string& jour, string& mois, string& annee) ;	// Extraire jour, mois, annee a partir d'une date
 		vector<int> ImageHistogramme(const Mat image) ;										// Histogramme
+		Mat ImageConvolution(const Mat image, const Mat filtre) ;							// Produit de convolution entre deux images
+		Mat ImageNiveauGris(const Mat image) ;												// Convertir une image en niveau de gris
+		Mat GenererFiltre(const int typeFiltre) ;											// Generer les filtres
 
 } ;
 
