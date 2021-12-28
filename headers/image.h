@@ -20,11 +20,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <experimental/filesystem>
 // Plot
-#include "matplotlibcpp.h"
+// #include <matplot/matplot.h>
+#include "./../headers/matplotlibcpp.h"
 namespace plt = matplotlibcpp ;
 
-//#include <chplot.h>
-
+using namespace plt ;
 using namespace std ;
 using namespace rapidjson ;
 using namespace cv ;

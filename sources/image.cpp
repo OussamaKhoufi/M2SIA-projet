@@ -2,11 +2,11 @@
 
 Image::Image()
 {
-    int nb ;                                                            // Numero de l'image
+    int nb ;                                                                    // Numero de l'image
     Json::Value images ;
     Json::Reader reader ;
-    ifstream bibliotheque_file("../DATA/bibliotheque.json", ios::in) ;        // Charger le contenu du fichier json 
-    reader.parse(bibliotheque_file, images) ;                           // Importer le contenu a l'objet Json
+    ifstream bibliotheque_file("../DATA/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
+    reader.parse(bibliotheque_file, images) ;                                   // Importer le contenu a l'objet Json
 
     cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
     do{
@@ -442,7 +442,8 @@ void Image::TraitementImage(){
     Mat image_channels[3] ;                                                         // Canaux de l'image
     Mat filtre = (Mat_<double>(3,3) << 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11) ;
 
-    
+    plot({1,3,2,4});
+    show();
 
     split(image, image_channels) ;
     Mat imageConv = ImageConvolution(image_channels[0], filtre) ;
@@ -814,7 +815,6 @@ vector<int> Image::ImageHistogramme(const Mat image){
             }
         }
     }
-
 
     // Retour
     return occurence ;

@@ -16,9 +16,12 @@
 #bibliotheque.o : bibliotheque.cpp bibliotheque.h
 #	g++ -c bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs
 
+binaries = main.o image.o bibliotheque.o exec_main
+
+all: clean $(binaries)
 
 exec_main : main.o image.o bibliotheque.o
-	g++ -o exec_main main.o bibliotheque.o image.o -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7
+	g++ -o exec_main main.o bibliotheque.o image.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
 
 main.o : ./sources/main.cpp 
 	g++ -c ./sources/main.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio -I/usr/include/python2.7 -lpython2.7 -Ipath/to/matplotlibcpp.h
@@ -29,3 +32,7 @@ image.o : ./sources/image.cpp ./headers/image.h
 bibliotheque.o : ./sources/bibliotheque.cpp ./headers/bibliotheque.h
 	g++ -c ./sources/bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs
 
+.PHONY: clean
+
+clean:
+	rm -f $(binaries) *.o
