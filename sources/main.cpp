@@ -1,26 +1,75 @@
 #include "../headers/bibliotheque.h"
 #include "../headers/image.h"
-
-void menuPrincipal();
-void menuImage(Bibliotheque objBiblio,int numImage);
-void menuBibliotheque(Bibliotheque objBiblio);
+using namespace std;
+void menuPrincipal(bool droitAcces);
+void menuImage(Bibliotheque objBiblio,int numImage,bool droitAcces);
+void menuBibliotheque(Bibliotheque objBiblio, bool droitAcces);
 void menuTraitementImage(Bibliotheque objBiblio,int numImage);
-void EntreePourContinuer();
+void entreePourContinuer();
+bool identification();
+void lancerApp();
+
 int main (void){
-	menuPrincipal();
+	lancerApp();
     return 0 ;
 }
-void EntreePourContinuer(){
-    cout << "Taper Entrée pour retourner au menu précedent...";
+void entreePourContinuer(){
+    cout << "Tapez sur une touche pour retourner au menu précedent...";
     cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
     cin.get();
+}
+bool identification(){
+	string userId;
+	string wantedId;
+	string wantedIdSubstr;
+	bool validId= false;
+	bool found = false;
+	bool droitAcces = false;
+	ifstream idUsersFile;
+	// Ouvrir le fichier idUsers
+	idUsersFile.open("./DATA/idUsers.txt");
+	// Tester si l ouverture a bien ete realise
+	if (!idUsersFile) {
+		cerr << "Impossible d'ouvrir le fichier idUsers.txt";
+		exit(1);   // arret de l application
+	}
+	// Saisie de l identifiant utilisateur
+	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // clear cin buffer
+	do {
+		cout << endl <<"Taper votre identifiant :";
+		getline(cin,wantedId);
+		if (wantedId.length()==6){
+			wantedIdSubstr = wantedId.substr(0,3);
+			if (none_of(wantedIdSubstr.begin(), wantedIdSubstr.end(), ::isdigit)){
+				wantedIdSubstr = wantedId.substr(4,5);
+				if (all_of(wantedIdSubstr.begin(), wantedIdSubstr.end(), ::isdigit)){
+					validId = true;
+				}
+			}
+		}	
+	}while(!validId);
+	//verification de l'identifiant
+	while (idUsersFile >> userId && found == false){
+		if (userId == wantedId){
+			found = true;
+		}
+	}
+	idUsersFile.close(); // fermeture du fichier idUsers
+	// Tester si l utilisateur est enregistré
+	if (!found) {
+		cout << "Utilisateur non enregistré" << endl;
+		//menuIdentification();
+	} else if (wantedId.substr(4,5) == "11" ){
+		droitAcces = true; // identifier les droits d'acces de l utilisateur
+	}
+	return droitAcces;
 }
 void menuTraitementImage(Bibliotheque objBiblio,int numImage){
 	Image objImage(objBiblio,numImage-1);
 	while(1){
 		int choixTraitement;
 		cout << endl << "---------------------------" << endl;
-		cout << endl << "---------Menu Traitement Image--------" << endl;
+		cout << endl << "---Menu Traitement Image---" << endl;
 		cout << endl << "---------------------------" << endl;
 		cout << endl << "1. Convertir l'image en niveau de gris" << endl;
 		cout << endl << "2. Filtrage avec Moyenneur" << endl;
@@ -29,18 +78,18 @@ void menuTraitementImage(Bibliotheque objBiblio,int numImage){
 		cout << endl << "5. Filtrage avec Gradient en x (Sobel)" << endl;
 		cout << endl << "6. Filtrage avec Gradient en y (Sobel)" << endl;
 		cout << endl << "0. Retour au menu Image" << endl;
-		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl;
+		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
 		cin >> choixTraitement;
 		if (choixTraitement){
 			objImage.TraitementImage(choixTraitement);
-			EntreePourContinuer();
+			entreePourContinuer();
 		}else {
-			menuImage(objBiblio,numImage);
+			menuImage(objBiblio,numImage,false);
 		}
 		
 	}
 }
-void menuImage(Bibliotheque objBiblio,int numImage){
+void menuImage(Bibliotheque objBiblio,int numImage,bool droitAcces){
 	Image objImage(objBiblio,numImage-1);
 	while(1){
 		int choix;
@@ -52,7 +101,7 @@ void menuImage(Bibliotheque objBiblio,int numImage){
 		cout << endl << "3. Réaliser un traitement sur le contenu de l'image" << endl;
 		cout << endl << "4. Modifier le descripteur de l'image" << endl;
 		cout << endl << "0. Retour au menu gestion de bibliothèque" << endl;
-		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl; 
+		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
 		cin >> choix;
 		switch (choix){
 			case 1:
@@ -68,16 +117,16 @@ void menuImage(Bibliotheque objBiblio,int numImage){
 			objImage.ModifierDescripteurImage();
 			break;
 			case 0:
-			menuBibliotheque(objBiblio);
+			menuBibliotheque(objBiblio,droitAcces);
 			break;
 			default:
 			cout << endl << "Choix non valide" << endl;
 			break;
 		}
-        EntreePourContinuer();
+        entreePourContinuer();
     }
 }
-void menuBibliotheque(Bibliotheque objBiblio){
+void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 	while(1){
 		int choix;
 		int numImage;
@@ -93,7 +142,7 @@ void menuBibliotheque(Bibliotheque objBiblio){
 		cout << endl << "7. Supprimer une image" << endl;
 		cout << endl << "8. Sauvegarder la bibliothque" << endl;
 		cout << endl << "0. Retour au menu principal" << endl;
-		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl; 
+		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
 		cin >> choix;
 		switch (choix){
 			case 1:
@@ -111,7 +160,7 @@ void menuBibliotheque(Bibliotheque objBiblio){
 			case 5: 
             cout << "Veuillez donner le numéro de l'image : ";
             cin >> numImage;
-			menuImage(objBiblio,numImage);
+			menuImage(objBiblio,numImage,droitAcces);
 			break;
 			case 6:
             objBiblio.AjouterImage();
@@ -123,40 +172,59 @@ void menuBibliotheque(Bibliotheque objBiblio){
             objBiblio.Sauvegarder();
 			break;
 			case 0:
-			menuPrincipal();
+			menuPrincipal(droitAcces);
 			break;
 			default:
 			cout << endl << "Choix non valide" << endl;
 			break;
 		}
-        EntreePourContinuer();
+        entreePourContinuer();
     }
 }
-void menuPrincipal(){
+void menuPrincipal(bool droitAcces){
 	while(1){
 		int choix;
-
         string nomBibliotheque;
 		cout << endl << "---------------------------" << endl;
 		cout << endl << "-------Menu Principal------" << endl;
 		cout << endl << "---------------------------" << endl;
 		cout << endl << "1. Charger une bibliothèque " << endl;
 		cout << endl << "0. Retour au menu d'identification" << endl;
-		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl; 
+		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
 		cin >> choix;
 		if (choix==1){
 			//Charger une bibliothèque à partir d'un fichier existant ou créer une nv si nécessaire
 			//cout << endl << "---Liste des bibliothèques existantes---" << endl;
             Bibliotheque objBiblio;
 			//lancer le menu Gestion de bibliothèque  
-			menuBibliotheque(objBiblio);
+			menuBibliotheque(objBiblio,droitAcces);
         }else if (choix==0){
+			lancerApp();
+        }else {
+			cout << endl << "Choix non valide" << endl;
+        }
+    }
+}
+void lancerApp(){
+	while(1){
+		int choix;
+		bool droitAcces;
+		cout << endl << "---------------------------" << endl;
+		cout << endl << "----Menu Identification----" << endl;
+		cout << endl << "---------------------------" << endl;
+		cout << endl << "1. Identifaction " << endl;
+		cout << endl << "0. Fermer l application" << endl;
+		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
+		cin >> choix;
+		if (choix==1){
+			droitAcces = identification();
+			cout << endl << "Identification réussite"<< endl;
+			menuPrincipal(droitAcces);
+        }else if (choix==0){
+			cout << endl << "Bye Bye !" << endl;
 			exit(1);
         }else {
 			cout << endl << "Choix non valide" << endl;
         }
     }
 }
-
-
-
