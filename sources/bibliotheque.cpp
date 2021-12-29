@@ -457,7 +457,6 @@ void  Bibliotheque::SupprimerImage(){
     // Declaration des variables
     Json::Value removed ;
     Json::Value biblio = getBilbiotheque() ;
-    Bibliotheque bibliotheque_modify ;
     int numero ;
     int nbImages = biblio["images"].size() ;     // Nombre d'images présent dans la bibliotheque avant la suppresion d'une nouvelle image
     

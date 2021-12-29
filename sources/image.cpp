@@ -132,7 +132,7 @@ Image::Image(Bibliotheque objBiblio,int numImage){
     _dateCreation = biblioJson["images"][numImage]["dateCreation"].asString() ;
     _cheminJson = objBiblio.getCheminJson() ;
     _numeroJson = numImage ;
-    Image::AfficherDescripteurImage();
+    //Image::AfficherDescripteurImage();
 }
 
 /*Getter*/
@@ -451,20 +451,48 @@ void Image::ModifierDescripteurImage(){
 }
 
 /*Traitement de l'image*/
-void Image::TraitementImage(){
+void Image::TraitementImage(int choixTraitement){
     Mat image = imread(getCheminAccesContenu()) ;                                   // Charger l'image
     Mat image_channels[3] ;                                                         // Canaux de l'image
-    Mat filtre = (Mat_<double>(3,3) << 1, 1, 1, 1, 1, 1, 1, 1, 1) ;
-    filtre = filtre/9 ;
-
-    Mat imageConv = ImageConvolution(image, filtre) ;
-    Mat image_NoirBlanc = ImageNiveauGris(image) ;
-
+    Mat imageResultat;
+    string titreFigure; 
+    
+    switch (choixTraitement){
+        case 1 :
+        imageResultat = ImageNiveauGris(image) ;
+        titreFigure="Image en Niveau de Gris";
+        break;
+        case 2 : 
+        imageResultat = ImageConvolution(image, GenererFiltre(1)) ;
+        titreFigure="Filtrage avec Moyenneur";
+        break;
+        case 3 : 
+        imageResultat = ImageConvolution(image, GenererFiltre(2)) ;
+        titreFigure="Filtrage avec Laplacien";
+        break;
+        case 4 : 
+        imageResultat = ImageConvolution(image, GenererFiltre(3)) ;
+        titreFigure="Filtrage avec Gaussien";
+        break;
+        case 5 : 
+        imageResultat = ImageConvolution(image, GenererFiltre(4)) ;
+        titreFigure="Filtrage avec Gradient en x (Sobel)";
+        break;
+        case 6 : 
+        imageResultat = ImageConvolution(image, GenererFiltre(5)) ;
+        titreFigure="Filtrage avec Gradient en y (Sobel)";
+        break;
+        default :
+        cout << "Error Choix Traitement d'image!";
+        break; 
+    }
+    
     // Affichage
-    namedWindow("Image Noir et Blanc") ; 
-    imshow("Image Noir et Blanc", image_NoirBlanc);  
+    namedWindow(titreFigure) ; 
+    imshow(titreFigure, imageResultat);  
     waitKey(0) ; 
-    destroyWindow("Image Noir et Blanc") ;
+    destroyWindow(titreFigure) ;
+
 }
 
 /*Methodes supplementaires*/

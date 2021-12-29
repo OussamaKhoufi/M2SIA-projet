@@ -78,7 +78,7 @@ class Image{
         void AfficherContenuImage() ;														// Afficher le contenu de l'image
         void AfficherDescripteurImage() ;													// Afficher les descripteurs de l'image
         void ModifierDescripteurImage() ;													// Modifier un descripteur de l'image
-        void TraitementImage() ;															// Traitement de l'image
+        void TraitementImage(int choixTraitement) ;															// Traitement de l'image
 
 		/*Methodes supplementaires*/					
 		void VerifierExtension(string& nom) ;												// Verifier l'extension ".json"

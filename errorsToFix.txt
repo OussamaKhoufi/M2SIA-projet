@@ -1,0 +1,27 @@
+***** Gestion de Bibliotheque *****
+*fonction construire sous liste : 
+- l'affichage des descripteurs de la sous-liste n'est pas complet  
+- critère cout ==> nombre d'images incorrectes lorsqu'on fait des appels consecutifs (le nombre d'images n'est pas remis à zéro)
+- critère Source ==> segmentation fault (core dumped)
+
+***** Ajout d'une image ******
+*Saisir Date :
+- Annee ou mois ou jour invalide => resaisie valide => Blocage
+- Saisie d'un nombre (exemple : 23) => Blocage 
+- plusieurs champs invalides simultanément (exemple : 15/32/1096 )=> Blocage
+- saisie valide mais // au lieu de / : (23//05/1996) => Arret immédiat du programme 
+* Cout : 
+- saisie d'un caractère => arret immédiat du programme
+- saisie d'un chifre + caractère (exemple : 5d ) => pas d'erreur
+**** supprime Image ****
+- numéro n'existe pas => deux messages d'erreur pas un seul 
+- saisie d'un caractère au lieu d'un numéro => boucle infini : "Choix invalide. Veuillez saisir 'Y' ou 'N'."
+- pas de message indicant que la suppression a été bien effectué 
+**** selectionner image ****
+- saisie d'un caractere au lieu d'un numéro=> arret du programme
+- saisie d'un numéro non valide => pas d'erreur => creation d'un objImage vide 
+**** Modification descripteur image *****
+- modification numéro => meme probleme que supprime Image  
+- modification cout => meme probleme que ajout Image 
+- modification des dates => meme probleme que ajout Image 
+

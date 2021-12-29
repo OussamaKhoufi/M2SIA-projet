@@ -4,6 +4,7 @@
 void menuPrincipal();
 void menuImage();
 void menuBibliotheque(Bibliotheque objBiblio);
+void menuImage(Image objImage);
 void EntreePourContinuer();
 int main (void){
 	menuPrincipal();
@@ -13,6 +14,30 @@ void EntreePourContinuer(){
     cout << "Taper Entrée pour retourner au menu précedent...";
     cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
     cin.get();
+}
+void menuTraitementImage(Image objImage){
+	while(1){
+		int choixTraitement;
+		cout << endl << "---------------------------" << endl;
+		cout << endl << "---------Menu Traitement Image--------" << endl;
+		cout << endl << "---------------------------" << endl;
+		cout << endl << "1. Convertir l'image en niveau de gris" << endl;
+		cout << endl << "2. Filtrage avec Moyenneur" << endl;
+		cout << endl << "3. Filtrage avec Laplacien" << endl;
+		cout << endl << "4. Filtrage avec Gaussien" << endl;
+		cout << endl << "5. Filtrage avec Gradient en x (Sobel)" << endl;
+		cout << endl << "6. Filtrage avec Gradient en y (Sobel)" << endl;
+		cout << endl << "0. Retour au menu Image" << endl;
+		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl;
+		cin >> choixTraitement;
+		if (choixTraitement){
+			objImage.TraitementImage(choixTraitement);
+			EntreePourContinuer();
+		}else {
+			menuImage(objImage);
+		}
+		
+	}
 }
 void menuImage(Bibliotheque objBiblio,int numImage){
 	Image objImage(objBiblio,numImage-1);
@@ -36,12 +61,13 @@ void menuImage(Bibliotheque objBiblio,int numImage){
 			objImage.AfficherDescripteurImage();
 			break;
 			case 3:
-			objImage.TraitementImage();
+			menuTraitementImage(objImage);
 			break;
 			case 4:
+			objImage.ModifierDescripteurImage();
 			break;
 			case 0:
-			//menuBibliotheque();
+			menuBibliotheque(objBiblio);
 			break;
 			default:
 			cout << endl << "Choix non valide" << endl;
