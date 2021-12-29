@@ -2,9 +2,9 @@
 #include "../headers/image.h"
 
 void menuPrincipal();
-void menuImage();
+void menuImage(Bibliotheque objBiblio,int numImage);
 void menuBibliotheque(Bibliotheque objBiblio);
-void menuImage(Image objImage);
+void menuTraitementImage(Bibliotheque objBiblio,int numImage);
 void EntreePourContinuer();
 int main (void){
 	menuPrincipal();
@@ -15,7 +15,8 @@ void EntreePourContinuer(){
     cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
     cin.get();
 }
-void menuTraitementImage(Image objImage){
+void menuTraitementImage(Bibliotheque objBiblio,int numImage){
+	Image objImage(objBiblio,numImage-1);
 	while(1){
 		int choixTraitement;
 		cout << endl << "---------------------------" << endl;
@@ -34,7 +35,7 @@ void menuTraitementImage(Image objImage){
 			objImage.TraitementImage(choixTraitement);
 			EntreePourContinuer();
 		}else {
-			menuImage(objImage);
+			menuImage(objBiblio,numImage);
 		}
 		
 	}
@@ -61,7 +62,7 @@ void menuImage(Bibliotheque objBiblio,int numImage){
 			objImage.AfficherDescripteurImage();
 			break;
 			case 3:
-			menuTraitementImage(objImage);
+			menuTraitementImage(objBiblio,numImage);
 			break;
 			case 4:
 			objImage.ModifierDescripteurImage();
@@ -76,7 +77,6 @@ void menuImage(Bibliotheque objBiblio,int numImage){
         EntreePourContinuer();
     }
 }
-
 void menuBibliotheque(Bibliotheque objBiblio){
 	while(1){
 		int choix;
@@ -132,7 +132,6 @@ void menuBibliotheque(Bibliotheque objBiblio){
         EntreePourContinuer();
     }
 }
-
 void menuPrincipal(){
 	while(1){
 		int choix;
