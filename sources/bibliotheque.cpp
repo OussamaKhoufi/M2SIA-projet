@@ -145,6 +145,7 @@ void Bibliotheque::ConstruireAfficherSousListe(){
         // Critere choisi : Cout
         case 1 :
             do{
+                compteur = 0 ;
                 // Choix de la plage de cout
                 cout << "Veuillez choisir une plage de cout :" << endl ;
                 cout << "1. Gratuit" << endl << "2. Cout ≤ 99,99 €" << endl << "3. 100 ≤ Cout ≤ 999,99 €" << endl << "4. Cout > 1000 €" << endl << "5. Plage personnalisee" << endl ;
@@ -268,7 +269,7 @@ void Bibliotheque::ConstruireAfficherSousListe(){
         // Critere choisi : Source
         case 2 :
             // Creer la liste des sources
-            listeSource[0] = biblio["images"][0]["source"].asString() ;
+            /*listeSource[0] = biblio["images"][0]["source"].asString() ;
             for (c = 1 ; c < nbImages ; c++){                                               // Pourchaque element de la bibliotheque
                 for(k = 0 ; k <= (int)listeSource.max_size() ; k++){                        // Pour chaque element de la liste des sources
                     if(biblio["images"][c]["source"].asString() == listeSource[k]){         // Si la source de l'element courant de la bibliotheque existe deja dans la liste
@@ -282,7 +283,7 @@ void Bibliotheque::ConstruireAfficherSousListe(){
             cout << "Les sources existantes dans la bibliotheque : " << endl ;
             for(c = 0 ; c < (int)listeSource.max_size() ; c++){
                 cout << listeSource[c] << endl ;
-            }
+            }*/
 
             // Saisie et verification de la source souhaitee
             do{
@@ -466,8 +467,8 @@ void  Bibliotheque::SupprimerImage(){
         cout << "Entrez le numero de l'image a supprimer"<< endl ;
         cin >> numero ;
 
+
         // Verifier l'existance du numero saisi
-        VerifierNumero(numero, getBilbiotheque()) ;
         if(VerifierNumero(numero, getBilbiotheque())){
             int indexImage = 0 ;
             for(const auto & obj : biblio["images"]) {
