@@ -1,0 +1,68 @@
+**** Modification descripteur image *****
+- modification numéro => meme probleme que supprime Image  
+- modification cout => meme probleme que ajout Image 
+- modification des dates => meme probleme que ajout Image 
+************
+
+
+**** Continuer (KHOUFI)
+- Ajouter un parametre "Message d'erreur"
+
+
+
+* Cout : (Ajouter Image) (MALIK)
+- saisie d'un chifre + caractère (exemple : 5d ) => pas d'erreur
+- saisie d'un caractère => arret immédiat du programme 
+=> Definir cout comme un string, verifier puis reconvertir en double
+
+-------
+*Contruire Sous Liste (TIN)
+- critère Source ==> segmentation fault (core dumped) 
+=>  // Creer la liste des sources (case 2) 
+
+-------
+*Contruire Sous Liste (TIN)
+- l'affichage des descripteurs de la sous-liste n'est pas complet  
+
+-------
+*Saisir Date : (TIN)
+- plusieurs champs invalides simultanément (exemple : 15/32/1096 )=> Blocage
+- Annee ou mois ou jour invalide => resaisie valide => Blocage 
+=> Corriger message d'erreur 
+
+-------
+*Saisir Date : (TIN)
+- Saisie d'un nombre (exemple : 23) => Blocage 
+- saisie valide mais // au lieu de / : (23//05/1996) => Arret immédiat du programme 
+=> Corriger le cin et verifier les caracteres apres la saisie
+
+-------
+**** supprime Image **** (MALIK)
+- numéro n'existe pas => deux messages d'erreur pas un seul  
+=> 2 appels de la fct
+
+-------
+**** supprime Image **** (MALIK)
+- saisie d'un caractère au lieu d'un numéro => boucle infini : "Choix invalide. Veuillez saisir 'Y' ou 'N'."
+=> Verifier le numero avant // Verifier l'existance du numero saisi
+-------
+**** supprime Image **** (MALIK)
+- pas de message indicant que la suppression a été bien effectué 
+=> Ajouter un message d'erreur
+
+------
+**** selectionner image **** (TIN)
+- saisie d'un caractere au lieu d'un numéro=> arret du programme
+=> Modifier Constructeur : Changer nb en string, verifier, puis reconvertir en int
+
+------
+**** selectionner image **** (TIN)
+- saisie d'un numéro non valide => pas d'erreur => creation d'un objImage vide 
+=> Verfier avec les numeros existants dans la bibliotheque (Constructeur)
+
+-----
+**** Constructeur Image (TIN)
+- Apres de supression dans la bibliotheque, la selection de l'image avec le numero n'a pas de sens
+
+nb = numero image et pas indice
+=> Modifier le constructeur (a voir avec la verification de l'existance du numero de l'image dans la bilbiotheque)
