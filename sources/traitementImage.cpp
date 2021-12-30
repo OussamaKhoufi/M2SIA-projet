@@ -1,7 +1,600 @@
 #include "../headers/traitementImage.h"
 using namespace cv ;
 using namespace std ;
-/*Generer une matrice zero*/
+
+
+//////////////////// Traitement de couleur ////////////////////
+
+// Convertir une image en niveau gris
+Mat ImageMonochrome(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageGris ;                             // Image resultante
+    Mat imageDouble ;                           // Image convertie en type double
+
+    // Convertion en double
+    image.convertTo(imageDouble, CV_32FC3) ;
+
+    // Decomposition des composantes de couleur
+    split(imageDouble, imageComposante) ;
+
+    // Initialisation
+    imageGris = imageComposante[0] ;
+
+    // Calculs
+    for(c = 1 ; c < nbComposante ; c++){
+        imageGris += imageComposante[c] ;
+    }
+    imageGris = imageGris/3 ;
+
+    // Convertion en unsigned char
+    imageGris.convertTo(imageGris, CV_8U) ;
+
+    // Retour
+    return imageGris ;
+}
+
+// Inverser une image en niveau gris
+Mat ImageInversementMono(const Mat image){
+    // Declaration des variables
+    int ligne, colonne ;
+    Mat imageInversee(image.size(), CV_8U) ;
+
+    // Inversement
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            imageInversee.at<unsigned char>(ligne, colonne) = 255 - image.at<unsigned char>(ligne, colonne) ;
+        }
+    }
+
+    // Retour
+    return imageInversee ;
+}
+
+// Inverser une image en couleurs
+Mat ImageInversement(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageInversee ;                         // Image resultante
+    vector<Mat> imageInverseeComposante ;       // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Inverser sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageInverseeComposante.push_back(ImageInversementMono(imageComposante[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageInverseeComposante, imageInversee) ;   
+
+    // Retour
+    return imageInversee ;
+}                                
+
+// Extraction une composante de couleur de l'image
+Mat ImageExtractionCouleur(const Mat image, int choix){
+    // Declaration de variable
+    Mat imageComposante[3] ;         // Des composantes de l'image originale
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Retour
+    return imageComposante[choix] ;
+}
+
+
+//////////////////// Traitement a base d'histogramme ////////////////////
+
+// Normalisation de l'histogramme
+Mat NormalisationMono(const Mat image){    
+    // Declaration des variables
+    int ligne, colonne ;                                // Indices
+    int min = MinImage(image) ;                         // Valeur minimum l'image de depart
+    int max = MaxImage(image) ;                         // Valeur maximum l'image de depart
+    double val ;                                        // Valeur intermediaire
+    Mat imageNormalisation(image.size(), CV_8U) ;       // Image resultante
+
+    // Normalisation
+    val = (double)255/(max - min) ;
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            imageNormalisation.at<unsigned char>(ligne, colonne) = (double)(image.at<unsigned char>(ligne, colonne) - min)*val ;
+        }
+    }
+
+    // Retour
+    return imageNormalisation ;
+}
+
+// Normalisation de l'histogramme d'une image en couleurs
+Mat Normalisation(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageNormalisation ;                    // Image resultante
+    vector<Mat> imageNormalisationComposante ;  // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Normalisation sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageNormalisationComposante.push_back(NormalisationMono(imageComposante[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageNormalisationComposante, imageNormalisation) ;    
+
+    // Retour
+    return imageNormalisation ;
+}
+
+// Egalisation d'une image en niveau gris
+Mat ImageEgalisationMono(const Mat image){
+    // Declaration des variables
+    int ligne, colonne ;                                    // Indices
+    vector<int> valeurEgal = Egalisation(image, 255) ;      // Histogramme egalise
+    Mat imageEgalisation(image.size(), CV_8U) ;             // Image resultante
+
+    // Remplacer les valeur d'intensite de chaque pixel par sa valeur egalisee
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            imageEgalisation.at<unsigned char>(ligne, colonne) = valeurEgal[(int)image.at<unsigned char>(ligne, colonne)] ;
+        }
+    }
+
+    // Retour
+    return imageEgalisation ;
+}
+
+// Egalisation d'une image en couleurs
+Mat ImageEgalisation(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageEgalisation ;                      // Image resultante
+    vector<Mat> imageEgalisationComposante ;    // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Egalisation sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageEgalisationComposante.push_back(ImageEgalisationMono(imageComposante[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageEgalisationComposante, imageEgalisation) ;   
+
+    // Retour
+    return imageEgalisation ;
+}
+
+// Rehaussement de contraste
+Mat ImageRehaussementContraste(const Mat image, const int choix){
+    switch (choix){
+        // Normalisation
+        case 1 :
+            return Normalisation(image) ;
+            break ;
+        // Egalisation
+        case 2 :
+            return ImageEgalisation(image) ;
+            break ;
+        default :
+            return ImageEgalisation(image) ;
+            break ;
+    }
+}
+
+//////////////////// Debruitage ////////////////////
+
+// Debruitage par filtre median pour une image en niveau gris
+Mat ImageMedianMono(const Mat image){
+    // Declaraton des variables
+    int ligne, colonne, lig, col ;                      // Indices
+    int taille = 3 ;                                    // Taille du filtre median
+    Mat matrice = ImageZero(taille, taille) ;           // Matrice intermediaire
+    Mat imageMiroir = ImageMiroir(image, taille) ;      // Image miroir
+    Mat imageMedian(image.size(), CV_8U) ;              // Image resultante
+
+    // Appliquer le filtre median
+    for(ligne = 0 ; ligne < (int)image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < (int)image.size().width ; colonne++){
+            // Matrice intermediaire
+            for(lig = 0 ; lig < taille ; lig++){
+                for(col = 0 ; col < 3 ; col++){
+                    matrice.at<unsigned char>(lig, col) = imageMiroir.at<unsigned char>(ligne + lig, colonne + col) ;
+                }
+            }
+            imageMedian.at<unsigned char>(ligne, colonne) = MatriceMedian(matrice) ;
+        }
+    }
+
+    // Retour
+    return imageMedian ;
+}
+
+// Debruitage par filtre median pour une image en couleurs
+Mat ImageMedian(const Mat image){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageMedian ;                           // Image resultante
+    vector<Mat> imageMedianComposante ;         // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Appliquer le filtre median sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageMedianComposante.push_back(ImageMedianMono(imageComposante[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageMedianComposante, imageMedian) ;   
+
+    // Retour
+    return imageMedian ;    
+}
+
+// Debruitage
+Mat ImageDebruitage(const Mat image, const int choix){
+    switch(choix){
+        // Filtre moyenneur
+        case 1 :
+            return ImageConvolution(image, GenererFiltre(1)) ;
+            break ;
+        // Filtre gaussien
+        case 2 :
+            return ImageConvolution(image, GenererFiltre(3)) ;
+            break ;
+        // Filtre median
+        case 3 : 
+            return ImageMedian(image) ;
+            break ;
+        default :
+            return ImageConvolution(image, GenererFiltre(3)) ;
+            break ;
+    }
+}
+
+//////////////////// Contours ////////////////////
+
+// Detection de contours par filtres gradients
+Mat ImageContourGradient(const Mat image){
+    // Declaration des variables
+    int nbComposante = image.channels() ;                   // Nombre de composantes de couleur de l'image originale
+    Mat gradientX, gradientY ;                              // Gradients en x et en y
+    Mat imageContour(image.size(), CV_8U) ;                 // Image resultante
+
+    // Verifier si l'image de depart est en niveau gris
+    if(nbComposante > 1){
+        imageContour = ImageMonochrome(image) ;
+    }
+
+    // Calculer des gradients
+	gradientX = GradientX(imageContour, "Sobel") ;          // En x
+    gradientY = GradientY(imageContour, "Sobel") ;          // En y
+
+    // Norme du gradient
+    imageContour = MatriceNorme(gradientX, gradientY) ;
+    // imageContour = ImageSeuillage(MatriceNorme(gradientX, gradientY), 250) ;
+
+    // Maximum de la norme du gradient dans la direction du gradient
+    //imageContour = MaxNormeGradient(ImageSeuillage(MatriceNorme(gradientX, gradientY), 250), gradientX, gradientY) ;
+
+    // Retour
+    return imageContour ;
+}
+
+// Detection de contours par filtre laplacien
+Mat ImageContourLaplace(const Mat image){
+   	return ImageSeuillage(ImageConvolution(ImageMonochrome(image), GenererFiltre(2)), 250) ;
+}
+
+// Detection de contours
+Mat ImageContour(const Mat image, const int choix){
+    switch (choix){
+    // Filtres gradients
+    case 1 :
+        return ImageContourGradient(image) ;
+        break ;
+    // Filtre laplacien
+    case 2 :
+        return ImageContourLaplace(image) ;
+        break ;
+    default:
+        return ImageContourGradient(image) ;
+        break;
+    }
+}
+
+// Rehaussement de contours
+Mat ImageRehaussementContour(const Mat image, const int val, const int choix){
+    // Declaration de variables
+    int c ;                                             // Indice
+    int nbComposante = image.channels() ;               // Nombre de composantes de couleurs de l'image originale
+    Mat imageComposante[nbComposante] ;                 // Composantes de couleurs de l'image originale
+    Mat imageContour = ImageContour(image, choix) ;     // Image de contours
+    Mat imageRehaussement ;                             // Image resultante
+    vector<Mat> imageRehaussementComposante ;           // Composantes de couleurs de l'image resultante
+
+    imageContour = imageContour/255 ;
+
+    if(nbComposante == 1){
+        imageRehaussement = image + imageContour*val ;
+    }else{
+        split(image, imageComposante) ;
+        for(c = 0 ; c < nbComposante ; c++){
+            imageRehaussementComposante.push_back(imageComposante[c] + imageContour*val) ;
+        }
+        merge(imageRehaussementComposante, imageRehaussement) ;
+    }
+
+    // Retour
+    return imageRehaussement ;
+}
+
+//////////////////// Segmentation ////////////////////
+
+// Seuillage d'une image en niveau gris
+Mat ImageSeuillage(const Mat image, const int seuil){
+    // Declaration des ariables
+    int ligne, colonne ;                        // Indice
+    Mat imageSeuil(image.size(), CV_8U) ;       // Image resultante
+
+    // Seuillage
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            if((int)image.at<unsigned char>(ligne, colonne) <= seuil){
+                imageSeuil.at<unsigned char>(ligne, colonne) = 0 ;
+            }else{
+                imageSeuil.at<unsigned char>(ligne, colonne) = 255 ;
+            }
+        }
+    }
+
+    // Retour
+    return imageSeuil ;
+}
+
+// Seuillage d'une image en couleurs
+Mat ImageSeuillage(const Mat image, vector<int> seuil){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageSeuillage ;                      // Image resultante
+    vector<Mat> imageSeuillageComposante ;    // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Seuillage sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageSeuillageComposante.push_back(ImageSeuillage(imageComposante[c], seuil[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageSeuillageComposante, imageSeuillage) ;   
+
+    // Retour
+    return imageSeuillage ;
+}             
+
+// Seuillage par hysteresis d'une image en niveau gris
+Mat ImageSeuillage(const Mat image, const int seuilBas, const int seuilHaut){
+    return (ImageSeuillage(image, seuilBas) - ImageSeuillage(image, seuilHaut)) ;
+}       
+
+// Seuillage par hysteresis d'une image en couleurs (Attention : B, V, R)
+Mat ImageSeuillage(const Mat image, vector<int> seuilBas, vector<int> seuilHaut){
+    return(ImageSeuillage(image, seuilBas) - ImageSeuillage(image, seuilHaut)) ;
+}   
+
+// Segmentation d'une image en niveau gris par seuillage simple
+Mat ImageSegmentation(const Mat image, const int seuil){
+    // Declaration des variables
+    int ligne, colonne ;
+    Mat imageSeuillee = ImageSeuillage(image, seuil) ;
+    Mat imageSegmentee(image.size(), CV_8U) ;
+
+    // Segmentation
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            imageSegmentee.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(ligne, colonne)*(imageSeuillee.at<unsigned char>(ligne, colonne)/255) ;
+        }
+    }
+
+    // Retour
+    return imageSegmentee ;
+}
+
+// Segmentation d'une image en couleurs par seuillage simple (Attention : B, V, R)
+Mat ImageSegmentation(const Mat image, vector<int> seuil){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    Mat imageSegmentee ;                        // Image resultante
+    vector<Mat> imageSegmenteeComposante ;      // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+
+    // Segmentation sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageSegmenteeComposante.push_back(ImageSegmentation(imageComposante[c], seuil[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageSegmenteeComposante, imageSegmentee) ;   
+
+    // Retour
+    return imageSegmentee ;    
+}
+
+// Segmentation d'une image en niveau gris par seuillage hysteresis
+Mat ImageSegmentation(const Mat image, const int seuilBas, const int seuilHaut){
+    return (ImageSegmentation(image, seuilBas) - ImageSegmentation(image, seuilHaut)) ;    
+}           
+
+// Segmentation d'une image en couleurs par seuillage hysteresis (Attention : B, V, R)
+Mat ImageSegmentation(const Mat image, vector<int> seuilBas, vector<int> seuilHaut){
+    return (ImageSegmentation(image, seuilBas) - ImageSegmentation(image, seuilHaut)) ; 
+}          
+
+//////////////////// Operations ////////////////////
+
+// Determiner la valeur minimum dans une matrice entiere
+int MinImage(const Mat image){
+    // Declaration des variables
+    int ligne, colonne ;    // Indices
+    int min ;               // Valeur min
+
+    // Initialisation
+    min = image.at<unsigned char>(0, 0) ;
+
+    // Chercher le minimum
+    for(ligne = 1 ; ligne < image.size().height ; ligne++){
+        for(colonne = 1 ; colonne < image.size().width ; colonne++){
+            if(min > image.at<unsigned char>(ligne, colonne)){
+                min = image.at<unsigned char>(ligne, colonne) ;
+            }
+        }
+    }
+
+    // Retour
+    return min ;
+}
+
+// Determiner la valeur maximum dans une matrice entiere
+int MaxImage(const Mat image){
+    // Declaration des variables
+    int ligne, colonne ;    // Indices
+    int max ;               // Valeur max
+
+    // Initialisation
+    max = image.at<unsigned char>(0, 0) ;
+
+    // Chercher le maximum
+    for(ligne = 1 ; ligne < image.size().height ; ligne++){
+        for(colonne = 1 ; colonne < image.size().width ; colonne++){
+            if(max < image.at<unsigned char>(ligne, colonne)){
+                max = image.at<unsigned char>(ligne, colonne) ;
+            }
+        }
+    }
+
+    // Retour
+    return max ;    
+}
+
+// Determiner la valeur maximum dans un vecteur reel
+double MaxVecteur(const vector<double> vecteur){
+    // Declaration des variables
+    int c ;                 // Indice
+    double valeurMax ;      // Valeur maximum
+
+    // Initialisation
+    valeurMax = vecteur[0] ;
+
+    // Chercher le maximum
+    for(c = 1 ; c < (int)vecteur.size() ; c++){
+        if(valeurMax < vecteur[c]){
+            valeurMax = vecteur[c] ;
+        }
+    }
+
+    // Retour
+    return valeurMax ;
+}
+int MaxVecteur(const vector<int> vecteur){
+    // Declaration des variables
+    int c ;                 // Indice
+    int valeurMax ;      // Valeur maximum
+
+    // Initialisation
+    valeurMax = vecteur[0] ;
+
+    // Chercher le maximum
+    for(c = 1 ; c < (int)vecteur.size() ; c++){
+        if(valeurMax < vecteur[c]){
+            valeurMax = vecteur[c] ;
+        }
+    }
+
+    // Retour
+    return valeurMax ;
+}
+
+// Histogramme
+vector<int> Histogramme(const Mat image, const int nbIntervalle){
+    // Declaration des variables
+    int c, ligne, colonne ;                     // Indices
+    vector<int> occurence(nbIntervalle) ;       // Vecteur des occurences
+
+    // Initialisation
+    for(c = 0 ; c < nbIntervalle ; c++){
+        occurence[c] = 0 ;
+    }
+
+    // Determiner le nombre d'occurences de chaque intervalle
+    for(c = 0 ; c < nbIntervalle - 1 ; c++){
+        for(ligne = 0 ; ligne < image.size().height ; ligne++){
+            for(colonne = 0 ; colonne < image.size().width ; colonne++){
+                if((image.at<unsigned char>(ligne, colonne) >= ((float)255/nbIntervalle*c)) && (image.at<unsigned char>(ligne, colonne) < ((float)255/nbIntervalle*(c+1)))){
+                    occurence[c]++ ;
+                }
+            }
+        }
+    }
+
+    // Derniere intervalle
+    for(ligne = 0 ; ligne < image.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image.size().width ; colonne++){
+            if((image.at<unsigned char>(ligne, colonne) == ((float)255/nbIntervalle*c)) ){
+                occurence[nbIntervalle - 1]++ ;
+            }
+        }
+    }
+
+    // Retour
+    return occurence ;
+}
+
+// Egalisation de l'histogramme d'une image au niveau gris
+vector<int> Egalisation(const Mat image, const int nbIntervalle){
+    // Declaration des variables
+    int c ;                                                         // Indice   
+    int nbPixel = image.size().height*image.size().width ;          // Nombre de pixels de l'image 
+    double somme = 0 ;                                              // Histogramme cumule
+    double coefficient = (double)255/nbPixel ;                              // Niveau de gris divise par pixel
+    vector<int> occurence = Histogramme(image, nbIntervalle) ;      // Histogramme de l'image
+    vector<int> occurenceEgal(nbIntervalle) ;                       // Histogramme egalise
+
+    // Egalisation
+    for(c = 0 ; c < nbIntervalle ; c++){
+        somme += occurence[c] ;
+        occurenceEgal[c] = coefficient*somme ;
+    }
+
+    // Retour
+    return occurenceEgal ;
+}
+
+// Generer une matrice zero
 Mat ImageZero(const int nbLigne, const int nbColonne){
     // Declaration des variables
     int ligne, colonne ;        // Indices
@@ -21,7 +614,210 @@ Mat ImageZero(const int nbLigne, const int nbColonne){
     return ImageZero ;
 }
 
-/*Effet miroir*/
+// Produit de convolution entre deux matrices
+Mat MatriceConvolution(const Mat image, const Mat filtre){
+    // Declaration des variables
+    int ligne, colonne, lig, col ;                                  // Indices
+    int L_image, C_image ;                                          // Dimensions de l'image
+    int L_filtre, C_filtre ;                                        // Dimensions du filtre
+    int val ;                                                       // Variable intermediaire
+    Mat imageConv(image.size(), CV_8U) ;                            // Image resultante
+    Mat imageMiroir = ImageMiroir(image, filtre) ;                  // Image avec effet miroir
+    
+    // Dimensions de l'image
+    L_image = image.size().height ;                                 // Nombre de lignes
+    C_image = image.size().width ;                                  // Nombre de colonnes
+
+    // Dimensions du filtre
+    L_filtre = filtre.size().height ;                               // Nombre de lignes
+    C_filtre = filtre.size().width ;                                // Nombre de colonnes
+
+    // Produit de convolution
+    for(ligne = 0 ; ligne <= L_image - 1 ; ligne++){                // Pour chaque ligne de l'image
+        for(colonne = 0 ; colonne <= C_image - 1 ; colonne++){      // Pour chaque colonne de l'image
+            val = 0 ;                                               // Remise a zero la variable intermediaire
+            for(lig = 0 ; lig <= L_filtre/2 + 1  ; lig++){          // Pour chaque ligne du filtre
+                for(col = 0 ; col <= C_filtre/2 + 1 ; col++){       // Pour chaque colonne du filtre
+                    val += imageMiroir.at<unsigned char>(ligne + lig, colonne + col)*filtre.at<double>(lig, col) ;
+                }
+            }
+            imageConv.at<unsigned char>(ligne, colonne) = val ;
+        }
+    }
+
+    // Retour
+    return imageConv ;
+}
+
+// Produit de convolution entre deux images
+Mat ImageConvolution(const Mat image, const Mat filtre){
+    // Declaration des variables
+    int c ;                                     // Indice
+    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
+    Mat imageConv ;                             // Image resultante
+    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
+    vector<Mat> imageConvComposante ;           // Des composantes de l'image resultante
+
+    // Decomposition des composantes de couleur
+    split(image, imageComposante) ;
+    
+    // Convolution sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageConvComposante.push_back(MatriceConvolution(imageComposante[c], filtre))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageConvComposante, imageConv) ;
+
+    // Retour
+    return imageConv ;
+}
+
+// Calculer la norme
+Mat MatriceNorme(const Mat imageX, const Mat imageY){
+    // Declaration des variables
+    int ligne, colonne ;                            // Indices
+    double x2, y2 ;                                 // x au carre et y au carre
+    Mat imageNorme(imageX.size(), CV_8U) ;          // Image resultante
+
+    // Calculer la norme de chaque pixel
+    for(ligne = 0 ; ligne < imageX.size().height ; ligne++){
+        for(colonne = 0 ; colonne < imageX.size().width ; colonne++){
+            x2 = imageX.at<unsigned char>(ligne, colonne)*imageX.at<unsigned char>(ligne, colonne) ;
+            y2 = imageY.at<unsigned char>(ligne, colonne)*imageY.at<unsigned char>(ligne, colonne) ;
+            imageNorme.at<unsigned char>(ligne, colonne) = sqrt(x2 + y2) ;
+        }
+    }
+
+    // Retour
+    return imageNorme ;
+}
+
+// Gradient en X
+Mat GradientX(const Mat image, const string typeFiltre){
+    if(typeFiltre == "Sobel"){
+        return ImageConvolution(image, GenererFiltre(4)) ;
+    }else if(typeFiltre == "Simple"){
+        return ImageConvolution(image, GenererFiltre(6)) ;
+    }else{
+        cout << "Type de filtre invalide." << endl ;
+        return image ;
+    }
+}
+
+// Gradient en Y
+Mat GradientY(const Mat image, const string typeFiltre){
+    if(typeFiltre == "Sobel"){
+        return ImageConvolution(image, GenererFiltre(5)) ;
+    }else if(typeFiltre == "Simple"){
+        return ImageConvolution(image, GenererFiltre(7)) ;
+    }else{
+        cout << "Type de filtre invalide." << endl ;
+        return image ;
+    }
+}                             
+
+// Maximum de la norme du gradient// Ne pas marcher  pour le moment
+Mat MaxNormeGradient(const Mat gradientNorme, const Mat gradientX, const Mat gradientY){
+    // Declaration des variables
+    const double pi = 3.141592 ;                                                                // Nombre pi
+    int ligne, colonne ;                                                                        // Indices
+    double theta ;                                                                              // Direction de la norme du gradient
+    vector<double> val ;                                                                        // Vecteur des valeurs a determiner le maximum
+    Mat imageMaxNormeGradient(gradientNorme.size(), CV_8U) ;                                    // Image resultante
+
+    // Initialisation
+    imageMaxNormeGradient = gradientNorme ;
+
+    // Ne pas traiter les bords horizontaux de l'image
+    for(ligne = 1 ; ligne < gradientNorme.size().height - 1 ; ligne++){
+        // Ne pas traiter les bords verticaux de l'image
+        for(colonne = 1 ; colonne < gradientNorme.size().width - 1 ; colonne++){     
+            // Initialisation   
+            val.clear() ;       
+
+            // Corriger les division par zero
+            if(gradientX.at<unsigned char>(ligne, colonne) == 0){
+                theta = pi/2 ;
+            }else{
+                theta = (double)gradientY.at<unsigned char>(ligne, colonne)/gradientX.at<unsigned char>(ligne, colonne) ;
+                // Mettre l'angle theta a la partie superieure du cercle trigonometrique
+                if((theta < 0) || (theta > pi)){
+                    theta += pi ;
+                }
+            }
+
+            // Remplir le vecteur des valeurs a comparer
+            // Si theta se situe entre [0, pi/4[ ou ]3pi/4, pi]
+            if((theta > 3*pi/4) || (theta < pi/4)){
+                val.push_back((double)gradientNorme.at<unsigned char>(ligne, colonne - 1)) ;    // Valeur du pixel a gauche
+                val.push_back((double)gradientNorme.at<unsigned char>(ligne, colonne + 1)) ;    // Valeur du pixel a droite
+            // Si theta se situe entre [pi/4, 3pi/4]
+            }else{
+                val.push_back((double)gradientNorme.at<unsigned char>(ligne - 1, colonne)) ;    // Valeur du pixel en bas
+                val.push_back((double)gradientNorme.at<unsigned char>(ligne + 1, colonne)) ;    // Valeur du pixel en haut
+            }
+            
+            // Valeur du pixel courant
+            val.push_back((double)gradientNorme.at<unsigned char>(ligne, colonne)) ;
+
+            // Determiner la valeur maximum
+            imageMaxNormeGradient.at<unsigned char>(ligne, colonne) = (unsigned char)MaxVecteur(val) ;
+        }
+    }
+
+    // Retour
+    return imageMaxNormeGradient ;
+}
+
+// Determiner la valeur mediane d'une matrice
+int MatriceMedian(const Mat matrice){
+    // Declaration des variables
+    int ligne, colonne ;
+    vector<int> vecteurValeur ;
+
+    // Initialisation
+    vecteurValeur.clear() ;
+
+    // Redimensionner la matrice en un veteur
+    for(ligne = 0 ; ligne < matrice.size().height ; ligne++){
+        for(colonne = 0 ; colonne < matrice.size().width ; colonne++){
+            vecteurValeur.push_back((int)matrice.at<unsigned char>(ligne, colonne)) ;
+        }
+    }     
+
+    // Retour
+    return VecteurMedian(vecteurValeur) ;
+} 
+
+// Determiner la valeur mediane d'un vecteur
+int VecteurMedian(vector<int> vecteur){
+    // Declaration des variables
+    int c ;                                 // Indice
+    vector<int> vecteurDecroissant ;        // Vecteur des valeurs rangees dans l'ordre decroissant
+
+    // Initialisation
+    vecteurDecroissant.clear() ;
+
+    // Ranger les valeurs du vecteur de depart dans l'ordre decroissant
+    while(vecteur.size()){
+        // Ecrire la valeur maximum du vecteur de depart
+        vecteurDecroissant.push_back(MaxVecteur(vecteur)) ;
+        for(c = 0 ; c < (int)vecteur.size() ; c++){
+            // Supprimer la valeur ecrite
+            if(MaxVecteur(vecteur) == vecteur[c]){
+                vecteur.erase(vecteur.begin() + c) ;
+            }
+        }
+    }
+
+    // Retour
+    return vecteurDecroissant[ceil((double)vecteurDecroissant.size()/2)] ;
+}
+
+//////////////////// Autres ////////////////////
+
+// Effet miroir
 Mat ImageMiroir(const Mat image, const Mat filtre){
     // Declaration des variables
     int ligne, colonne, lig, col ;                                          // Indices
@@ -165,157 +961,275 @@ Mat ImageMiroir(const Mat image, const Mat filtre){
     return ImageMiroir ;
 }
 
-/*Produit de convolution entre deux matrices*/
-Mat MatriceConvolution(const Mat image, const Mat filtre){
+Mat ImageMiroir(const Mat image, const Mat filtre, int type = 6) ;	    // Effet miroir - Filtre donne
+
+
+Mat ImageMiroir(const Mat image, const int taille){
     // Declaration des variables
-    int ligne, colonne, lig, col ;                                  // Indices
-    int L_image, C_image ;                                          // Dimensions de l'image
-    int L_filtre, C_filtre ;                                        // Dimensions du filtre
-    int val ;                                                       // Variable intermediaire
-    Mat imageConv = Mat(image.size(), CV_8U) ;                      // Image resultante
-    Mat imageMiroir = ImageMiroir(image, filtre) ;                // Image avec effet miroir
-    
+    int ligne, colonne, lig, col ;                                          // Indices
+    int L_image, C_image, L_filtre, C_filtre, L_miroir, C_miroir  ;         // Dimensions
+
     // Dimensions de l'image
-    L_image = image.size().height ;                                 // Nombre de lignes
-    C_image = image.size().width ;                                  // Nombre de colonnes
+    L_image = image.size().height ;                                         // Nombre de lignes
+    C_image = image.size().width ;                                          // Nombre de colonnes
 
     // Dimensions du filtre
-    L_filtre = filtre.size().height ;                               // Nombre de lignes
-    C_filtre = filtre.size().width ;                                // Nombre de colonnes
+    L_filtre = taille ;                                                     // Nombre de lignes
+    C_filtre = taille ;                                                     // Nombre de colonnes
 
-    // Produit de convolution
-    for(ligne = 0 ; ligne <= L_image - 1 ; ligne++){                // Pour chaque ligne de l'image
-        for(colonne = 0 ; colonne <= C_image - 1 ; colonne++){      // Pour chaque colonne de l'image
-            val = 0 ;                                               // Remise a zero la variable intermediaire
-            for(lig = 0 ; lig <= L_filtre/2 + 1  ; lig++){          // Pour chaque ligne du filtre
-                for(col = 0 ; col <= C_filtre/2 + 1 ; col++){       // Pour chaque colonne du filtre
-                    val += imageMiroir.at<unsigned char>(ligne + lig, colonne + col)*filtre.at<double>(lig, col) ;
-                }
-            }
-            imageConv.at<unsigned char>(ligne, colonne) = val ;
+    // Initialisation de l'image resultante - Effet miroir
+    L_miroir = L_image + L_filtre - 1 ;                                     // Nombre de lignes
+    C_miroir = C_image + C_filtre - 1 ;                                     // Nombre de colonnes
+
+    // Initialisation de l'image resultante
+    Mat ImageMiroir = ImageZero(L_miroir, C_miroir) ;                 
+
+    // Les bords horizontaux de l'image avec effet miroir
+    // Premieres lignes 
+    // Initialisation des indices
+    lig = 0 ;      
+    for(ligne = floor(L_filtre/2) - 1 ; ligne >= 0 ; ligne--){
+        col = 0 ;
+        for (colonne = ceil(C_filtre/2) ; colonne <= (C_miroir - ceil(C_filtre/2) - 1) ; colonne++){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
         }
+        lig++ ; 
     }
-
-    // Retour
-    return imageConv ;
-}
-
-/*Histogramme*/
-vector<int> ImageHistogramme(const Mat image){
-    // Declaration des variables
-    int nbIntervalle = 100 ;                    // Nombre d'intervalles
-    int c, ligne, colonne ;                     // Indices
-    vector<int> occurence(nbIntervalle) ;       // Vecteur des occurences
-
-    // Initialisation
-    for(c = 0 ; c < nbIntervalle ; c++){
-        occurence[c] = 0 ;
-    }
-
-    // Determiner le nombre d'occurences de chaque intervalle
-    for(c = 0 ; c < nbIntervalle - 1 ; c++){
-        for(ligne = 0 ; ligne < image.size().height ; ligne++){
-            for(colonne = 0 ; colonne < image.size().width ; colonne++){
-                if((image.at<unsigned char>(ligne, colonne) >= ((float)255/nbIntervalle*c)) && (image.at<unsigned char>(ligne, colonne) < ((float)255/nbIntervalle*(c+1)))){
-                    occurence[c]++ ;
-                }
-            }
+  
+    // Dernieres lignes 
+    // Initialisation des indices
+    lig = L_image - floor(L_filtre/2) ; 
+    for(ligne = L_miroir - 1 ; ligne >= L_miroir - floor(L_filtre/2) ; ligne--){
+        col = 0 ;     
+        for (colonne = ceil(C_filtre/2) ; colonne <= (C_miroir - ceil(C_filtre/2) - 1) ; colonne++){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
         }
+        lig++ ; 
     }
 
-    // Retour
-    return occurence ;
-}
-
-/*Produit de convolution entre deux images*/
-Mat ImageConvolution(const Mat image, const Mat filtre){
-    // Declaration des variables
-    int c ;                                     // Indice
-    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
-    Mat imageConv ;                             // Image resultante
-    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
-    vector<Mat> imageConvComposante ;           // Des composantes de l'image resultante
-
-    // Decomposition des composantes de couleur
-    split(image, imageComposante) ;
-    
-    // Convolution sur tous les canaux de couleur
-    for(c = 0 ; c < nbComposante ; c++){
-        imageConvComposante.push_back(MatriceConvolution(imageComposante[c], filtre))  ;
+    // Les bords verticaux de l'image avec effet miroir
+    // Premieres colonnes 
+    // Initialisation des indices
+    lig = 0 ; 
+    for(ligne = ceil(L_filtre/2) ; ligne <= (L_miroir - floor(L_filtre/2) - 1) ; ligne++){
+        col = 0 ; 
+        for (colonne = floor(C_filtre/2) - 1 ; colonne >= 0 ; colonne--){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
+        }
+        lig++ ; 
     }
-    
-    // Fusion des composantes de couleur
-    merge(imageConvComposante, imageConv) ;
-
-    // Retour
-    return imageConv ;
-}
-
-/*Convertir une image en niveau de gris*/
-Mat ImageNiveauGris(const Mat image){
-    // Declaration des variables
-    int c ;                                     // Indice
-    int nbComposante = image.channels() ;       // Nombre de composantes de couleur
-    Mat imageComposante[nbComposante] ;         // Des composantes de l'image originale
-    Mat imageGris ;                             // Image resultante
-    Mat imageDouble ;                           // Image convertie en type double
-
-    // Convertion en double
-    image.convertTo(imageDouble, CV_32FC3) ;
-
-    // Decomposition des composantes de couleur
-    split(imageDouble, imageComposante) ;
-
-    // Initialisation
-    imageGris = imageComposante[0] ;
-
-    // Calculs
-    for(c = 1 ; c < nbComposante ; c++){
-        imageGris += imageComposante[c] ;
+ 
+    // Dernieres colonnes
+    // Initialisation des indices
+    lig = 0 ; 
+    for(ligne = ceil(L_filtre/2) ; ligne <= (L_miroir - floor(L_filtre/2) - 1) ; ligne++){
+        col = C_image - 1 ; 
+        for (colonne = C_miroir - floor(C_filtre/2) ; colonne <= (C_miroir - 1) ; colonne++){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col-- ; 
+        }
+        lig++ ; 
     }
-    imageGris = imageGris/3 ;
 
-    // Convertion en unsigned char
-    imageGris.convertTo(imageGris, CV_8U) ;
+    // Les coins
+    // En haut, a gauche
+    // Initialisation des indices
+    lig = floor(L_filtre/2) ; 
+    for(ligne = 0 ; ligne <= (floor(L_filtre/2) - 1) ; ligne++){
+        col = floor(C_filtre/2) ;    
+        for (colonne = 0 ; colonne <= (floor(C_filtre/2) - 1) ; colonne++){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col-- ; 
+        }
+        lig-- ; 
+    }    
 
-    // Retour
-    return imageGris ;
+    // En haut, a droite
+    // Initialisation des indices
+    lig = floor(L_filtre/2) ; 
+    for(ligne = 0 ; ligne <= (floor(L_filtre/2) - 1) ; ligne++){
+        col = C_image - floor(C_filtre/2) ;    
+        for (colonne = C_miroir - 1 ; colonne >= (C_miroir - floor(C_filtre/2)) ; colonne--){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
+        }
+        lig-- ; 
+    }    
+
+    // En bas, a gauche
+    // Initialisation des indices
+    lig = L_image - 1 ; 
+    for(ligne = L_miroir - floor(L_filtre/2) ; ligne <= (L_miroir - 1) ; ligne++){
+        col = 0 ;    
+        for (colonne = floor(C_filtre/2) - 1 ; colonne >= 0 ; colonne--){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
+        }
+        lig-- ; 
+    }       
+
+    // En bas, a droite
+    // Initialisation des indices
+    lig = L_image - 1 ; 
+    for(ligne = L_miroir - floor(L_filtre/2) ; ligne <= (L_miroir - 1) ; ligne++){
+        col = C_image - floor(C_filtre/2) ;    
+        for (colonne = C_miroir - 1 ; colonne >= C_miroir - floor(C_filtre/2) ; colonne--){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
+        }
+        lig-- ; 
+    }    
+
+    // Contenu
+    // Initialisation des indices
+    lig = 0 ; 
+    for(ligne = ceil(L_filtre/2) ; ligne <= (L_miroir - floor(L_filtre/2) - 1) ; ligne++){
+        col = 0 ;    
+        for (colonne = ceil(C_filtre/2) ; colonne <= (C_miroir - floor(C_filtre/2) - 1) ; colonne++){
+            ImageMiroir.at<unsigned char>(ligne, colonne) = image.at<unsigned char>(lig, col) ;
+            // Incrementation des indices
+            col++ ; 
+        }
+        lig++ ; 
+    }    
+
+    return ImageMiroir ;
 }
 
-/*Generer les filtres*/
+// Generer les filtres
 Mat GenererFiltre(const int typeFiltre){
-    // Declaration de variable
-    Mat filtre ;
-    Mat filtreGradient[2] ;
-
     switch (typeFiltre){
     // Filtre moyenneur
     case 1 :
-        filtre = (Mat_<double>(3,3) << 1, 1, 1, 1, 1, 1, 1, 1, 1) ;
-        filtre = filtre/9 ;
+        return ((Mat_<double>(3,3) << 1, 1, 1, 1, 1, 1, 1, 1, 1)/9) ;
         break ;
     // Filtre laplacien
     case 2 :
-        filtre = (Mat_<double>(3,3) << -1, -1, -1, -1, 8, -1, -1, -1, -1) ;
+        return (Mat_<double>(3,3) << -1, -1, -1, -1, 8, -1, -1, -1, -1) ;
         break ;
     // Filtre gaussien
     case 3 :
-        filtre = (Mat_<double>(3,3) << 1, 2, 1, 2, 4, 2, 1, 2, 1) ;
-        filtre = filtre/16 ;
+        return ((Mat_<double>(3,3) << 1, 2, 1, 2, 4, 2, 1, 2, 1)/16) ;
         break ;
     // Filtre gradient en x (Sobel)
     case 4 :
-        filtre = (Mat_<double>(3,3) << -1, -2, -1, 0, 0, 0, 1, 2, 1) ;
+        return (Mat_<double>(3,3) << -1, -2, -1, 0, 0, 0, 1, 2, 1) ;
         break ;
     // Filtre gradient en y (Sobel)
     case 5 :
-        filtre = (Mat_<double>(3,3) << -1, 0, 1, -2, 0, 2, -1, 0, 1) ;
+        return (Mat_<double>(3,3) << -1, 0, 1, -2, 0, 2, -1, 0, 1) ;
+        break ;
+    // Filtre gradient en x (simple)
+    case 6 : 
+        return (Mat_<double>(3,3) << 0, 1, 0, 0, 0, 0, 0, -1, 0) ;
+        break ;
+    // Filtre gradient en y (simple)
+    case 7 :
+        return (Mat_<double>(3,3) << 0, 0, 0, 1, 0, -1, 0, 0, 0) ;
         break ;
     default:
-        cout << "Type de filtre invalide." << endl ;
+        return (Mat_<double>(3,3) << 0, 0, 0, 0, 1, 0, 0, 0, 0) ;
         break;
     }
+}
+
+// Concatener 2 images de memes dimensions en 1 image (en niveau gris)
+Mat ConcatenerImageMono(Mat image1, Mat image2){
+    // Declaration des variables
+    int ligne, colonne ;                                // Indices
+    Size dimensionImage ;                               // Dimensions de l'image resultante
+
+    // Calculer les dimensions de l'image resultante
+    dimensionImage.height = image1.size().height ;      // Nombre de lignes
+    dimensionImage.width = image1.size().width*2 ;      // Nombre de colonne
+
+    // Initialisation de l'image resultante
+    Mat imageConcatener(dimensionImage, CV_8U) ;  
+
+    // Concatenation
+    // Image 1
+    for(ligne = 0 ; ligne < image1.size().height ; ligne++){
+        for(colonne = 0 ; colonne < image1.size().width ; colonne++){
+            imageConcatener.at<unsigned char>(ligne, colonne) = image1.at<unsigned char>(ligne, colonne) ;
+        }
+    }
+    // Image 2
+    for(ligne = 0 ; ligne < image2.size().height ; ligne++){
+        for(colonne = image2.size().width ; colonne < image2.size().width*2 ; colonne++){
+            imageConcatener.at<unsigned char>(ligne, colonne) = image2.at<unsigned char>(ligne, colonne - image2.size().width) ;
+        }
+    }    
 
     // Retour
-    return filtre ;
+    return imageConcatener ;
+}
+
+// Concatener 2 images de memes dimensions en 1 image (en couleurs)
+Mat ConcatenerImage(Mat image1, Mat image2){
+    // Declaration des variables
+    int c ;                                             // Indice
+    int nbComposante = 3 ;                              // Nombre de composantes de couleur
+    Mat image1Composante[nbComposante] ;                // Des composantes de l'image originale 1 
+    Mat image2Composante[nbComposante] ;                // Des composantes de l'image originale 2
+    Size dimensionImage ;                               // Dimensions de l'image resultante
+    vector<Mat> imageConcatComposante ;                 // Des composantes de l'image resultante
+
+    // Calculer les dimensions de l'image resultante
+    dimensionImage.height = image1.size().height ;      // Nombre de lignes
+    dimensionImage.width = image1.size().width*2 ;      // Nombre de colonne
+
+    // Initialisation de l'image resultante
+    Mat imageConcatener(dimensionImage, CV_8UC3) ;  
+
+    // Verifier si les images sont en couleurs et corriger si necesaire
+    if(image1.channels() == 1){
+        image1 = MonoCouleur(image1) ;
+    }
+    if(image2.channels() == 1){
+        image2 = MonoCouleur(image2) ;
+    }
+
+    // Decomposition des composantes de couleur
+    split(image1, image1Composante) ;                   // Image 1
+    split(image2, image2Composante) ;                   // Image 2
+
+    // Normalisation sur chaque canal de couleur
+    for(c = 0 ; c < nbComposante ; c++){
+        imageConcatComposante.push_back(ConcatenerImageMono(image1Composante[c], image2Composante[c]))  ;
+    }
+    
+    // Fusion des composantes de couleur
+    merge(imageConcatComposante, imageConcatener) ;   
+
+    // Retour
+    return imageConcatener ;
+}
+
+// Convertir le format d'une image monochrome en format RVB
+Mat MonoCouleur(const Mat image){
+    // Declaration des variables
+    int c ;                                             // Indice
+    Mat imageCouleur(image.size(), CV_8UC3) ;           // Image resultante
+    vector<Mat> imageCouleurComposante ;                // Des composantes de l'image resultante
+
+    // Copier le contenu de l'image de depart dans les trois canaux de couleurs
+    for(c = 0 ; c < 3 ; c++){
+        imageCouleurComposante.push_back(image) ;
+    }
+    
+    // Fusion
+    merge(imageCouleurComposante, imageCouleur) ;
+    // Retour
+    return imageCouleur ;
 }
