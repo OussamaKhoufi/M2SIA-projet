@@ -20,6 +20,7 @@
 **** selectionner image ****
 - saisie d'un caractere au lieu d'un numéro=> arret du programme
 - saisie d'un numéro non valide => pas d'erreur => creation d'un objImage vide 
+- apres supression d une image => numero image supprimé saisie => affichage image restante (utiliser numero pour selectionner image pas l'index)
 **** Modification descripteur image *****
 - modification numéro => meme probleme que supprime Image  
 - modification cout => meme probleme que ajout Image 

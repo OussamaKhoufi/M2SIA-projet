@@ -63,10 +63,15 @@ bool identification(){
 	if (!found) {
 		cout << "Utilisateur non enregistré" << endl;
 		//menuIdentification();
-	} else if (wantedId.substr(4,5) == "11" ){
-		droitAcces = true; // identifier les droits d'acces de l utilisateur
+	} else {
+		if (wantedId.substr(4,5) == "11" ){
+			droitAcces = true; // identifier les droits d'acces de l utilisateur
+		}
+		cout << "Identification réussite" << endl; 
+		menuPrincipal(droitAcces);
 	}
-	cout << endl << droitAcces<< endl;
+
+	//cout << endl << droitAcces<< endl;
 	return droitAcces;
 }
 void menuTraitementImage(Bibliotheque objBiblio,int numImage){
@@ -116,11 +121,21 @@ void menuImage(Bibliotheque objBiblio,int numImage,bool droitAcces){
 			objImage.AfficherDescripteurImage();
 			break;
 			case 3:
-			menuTraitementImage(objBiblio,numImage);
-			break;
+			if (droitAcces){
+				menuTraitementImage(objBiblio,numImage);
+				break;
+			} else {
+				messagePasDroitAcces();
+				break;
+			}
 			case 4:
-			objImage.ModifierDescripteurImage();
-			break;
+			if (droitAcces){
+				objImage.ModifierDescripteurImage();
+				break;
+			} else {
+				messagePasDroitAcces();
+				break;
+			}
 			case 0:
 			menuBibliotheque(objBiblio,droitAcces);
 			break;
@@ -238,8 +253,7 @@ void lancerApp(){
 		cin >> choix;
 		if (choix==1){
 			droitAcces = identification();
-			cout << endl << "Identification réussite"<< endl;
-			menuPrincipal(droitAcces);
+			cout << endl << droitAcces << endl;
         }else if (choix==0){
 			cout << endl << "Bye Bye !" << endl;
 			exit(1);
