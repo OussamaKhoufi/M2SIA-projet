@@ -1,13 +1,14 @@
 #include "../headers/bibliotheque.h"
 #include "../headers/image.h"
 using namespace std;
+void lancerApp();
+bool identification();
 void menuPrincipal(bool droitAcces);
 void menuImage(Bibliotheque objBiblio,int numImage,bool droitAcces);
 void menuBibliotheque(Bibliotheque objBiblio, bool droitAcces);
 void menuTraitementImage(Bibliotheque objBiblio,int numImage);
 void entreePourContinuer();
-bool identification();
-void lancerApp();
+void messagePasDroitAcces();
 
 int main (void){
 	lancerApp();
@@ -17,6 +18,9 @@ void entreePourContinuer(){
     cout << "Tapez sur une touche pour retourner au menu précedent...";
     cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
     cin.get();
+}
+void messagePasDroitAcces(){
+	cout << endl <<"Vous n'avez pas le droit d'accéder à cette fonctionnalité." << endl;
 }
 bool identification(){
 	string userId;
@@ -62,6 +66,7 @@ bool identification(){
 	} else if (wantedId.substr(4,5) == "11" ){
 		droitAcces = true; // identifier les droits d'acces de l utilisateur
 	}
+	cout << endl << droitAcces<< endl;
 	return droitAcces;
 }
 void menuTraitementImage(Bibliotheque objBiblio,int numImage){
@@ -130,6 +135,7 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 	while(1){
 		int choix;
 		int numImage;
+		//objBiblio.majBiblioSuivantDroitAcces(droitAcces);
 		cout << endl << "----------------------------------" << endl;
 		cout << endl << "---Menu Gestion de Bibliotheque---" << endl;
 		cout << endl << "----------------------------------" << endl;
@@ -163,13 +169,28 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 			menuImage(objBiblio,numImage,droitAcces);
 			break;
 			case 6:
-            objBiblio.AjouterImage();
-			break;
+            if (droitAcces){
+				objBiblio.AjouterImage();break;
+			} else {
+				messagePasDroitAcces();
+				break;
+			}
 			case 7:
-            objBiblio.SupprimerImage();
-			break;
+            if (droitAcces){
+				objBiblio.SupprimerImage();
+				break;
+			} else {
+				messagePasDroitAcces();
+				break;
+			}			
 			case 8:
-            objBiblio.Sauvegarder();
+            if (droitAcces){
+				objBiblio.Sauvegarder();
+				break;
+			} else {
+				messagePasDroitAcces();
+				break;
+			}
 			break;
 			case 0:
 			menuPrincipal(droitAcces);
@@ -184,7 +205,6 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 void menuPrincipal(bool droitAcces){
 	while(1){
 		int choix;
-        string nomBibliotheque;
 		cout << endl << "---------------------------" << endl;
 		cout << endl << "-------Menu Principal------" << endl;
 		cout << endl << "---------------------------" << endl;

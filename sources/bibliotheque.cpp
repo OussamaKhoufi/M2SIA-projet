@@ -705,6 +705,10 @@ bool Bibliotheque::VerifierNumero(int& numero, const Json::Value biblio){
     // Retour
     return exist ;
 }
+/*Mettre a jour la bibliotheque suivant les droits d'acces*/
+void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
+
+}
 
 /*Veriffier bibliotheque vide ou invalide*/
 bool Bibliotheque::VerifierBibliotheque(){
