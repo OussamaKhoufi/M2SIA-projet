@@ -1,6 +1,7 @@
 #include "../headers/bibliotheque.h"
 
-/*Constructeur vide*/
+/*COnstructeurs*/
+// Constructeur vide
 Bibliotheque::Bibliotheque(){
     // Declaration des variables
     string nomNew ;                                             // Nom du nouveau fichier
@@ -25,7 +26,6 @@ Bibliotheque::Bibliotheque(){
 
         // Verifier l'extension ".json"
         VerifierExtension(nomNew) ;
-        cout << nomNew << endl ; 
         // Lecture du fichier et copie du contenu dans la bibliotheque
         reader.parse(bibliothequeFile, _bibliotheque) ;    
 
@@ -36,7 +36,7 @@ Bibliotheque::Bibliotheque(){
     _cheminJson = nomNew;
 }
 
-/*Constructeur avec le nom de la bibliotheque donnee par l'utilisateur*/
+// Constructeur avec le nom de la bibliotheque donnee par l'utilisateur
 Bibliotheque::Bibliotheque(string nom){
     // Declaration des variables
     Json::Reader reader ;                       // Variable pour lire un fichie Json
@@ -44,7 +44,6 @@ Bibliotheque::Bibliotheque(string nom){
     // Verifier l'extension ".json"
     VerifierExtension(nom) ;
     nom = "./DATA/Bibliothèques/" + nom ;
-    cout << nom << endl ;
 
     // Lecture du fichier et copie du contenu dans la bibliotheque
     ifstream bibliothequeFile(nom, ios::in) ;   // Chargement du fichier Json
@@ -52,22 +51,29 @@ Bibliotheque::Bibliotheque(string nom){
     _cheminJson = nom;                
 }
 
-/*Constructeur avec un objet Json*/
+// Constructeur avec un objet Json
 Bibliotheque::Bibliotheque(const Json::Value bibliotheque){
     setBilbiotheque(bibliotheque) ;
 }
 
-/*Getter*/
+// Getters
 Json::Value Bibliotheque::getBilbiotheque() const{
     return _bibliotheque ;
 }
-string Bibliotheque::getCheminJson() const { return _cheminJson; }
-/*Setter*/
+string Bibliotheque::getCheminJson() const {
+    return _cheminJson; 
+}
+
+// Setters
 void Bibliotheque::setBilbiotheque(const Json::Value bibliotheque){
     _bibliotheque = bibliotheque ;
 }
+void Bibliotheque::setCheminJson(const string cheminJson){
+    _cheminJson = cheminJson ;
+}
 
-/*Afficher la liste des descripteurs*/
+/*Methodes principales*/
+// Afficher la liste des descripteurs
 void Bibliotheque::AfficherDescripteurs(){
     // Declaration des variables
     Json::Value biblio = getBilbiotheque() ;        // Objet Json
@@ -77,6 +83,7 @@ void Bibliotheque::AfficherDescripteurs(){
     // Affichage
     for (c = 0 ; c < nbImages ; c++){
         cout << "Descipteur de l'image " << c+1 << " : " << endl ;
+        cout << "Chemin d'acces : " << biblio["images"][c]["cheminAcces"].asString() << endl ;
         cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
         cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
         cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
@@ -87,51 +94,69 @@ void Bibliotheque::AfficherDescripteurs(){
     }
 }
 
-/*Affichage le cout d'une image*/
+// Afficher la liste des descripteurs d'une partie indiquee de la bibliotheque
+void Bibliotheque::AfficherDescripteurs(const Json::Value bibliotheque, const int indice){
+    cout << "Source : " << bibliotheque["images"][indice]["source"].asString() << endl ;
+    cout << "Titre : " << bibliotheque["images"][indice]["titre"].asString() << endl ;
+    cout << "Numero : " << bibliotheque["images"][indice]["numero"].asInt() << endl ;
+    cout << "Cout : " << bibliotheque["images"][indice]["cout"].asDouble() << "€" << endl ;
+    cout << "Permission : " << bibliotheque["images"][indice]["acces"].asString() << endl ;
+    cout << "Date d'ajout : " << bibliotheque["images"][indice]["dateAjout"].asString() << endl ;
+    cout << "Date de creation : " << bibliotheque["images"][indice]["dateCreation"].asString() << endl << endl ;     
+} 
+
+// Affichage le cout d'une image
 void Bibliotheque::AfficherCout(){
     // Declaration des variables
     int c ;                                         // Indice
-    int numeroSaisie ;                              // Numero saisi par l'utilisateur
+    string numeroSaisi ;                            // Numero saisi par l'utilisateur
+    int numero ;                                    // Numero de l'image
     Json::Value biblio = getBilbiotheque() ;        // Objet Json
     int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images existantes dans la bibliotheque
      
     // Choix du numero de l'image et verification 
+    cout << "Veuillez donner le numero de l'image : " << endl ;
     do{
         // Saisie du numero souhaite
-        cout << "Veuillez donner le numero de l'image : " << endl ;
-        cin >> numeroSaisie ; 
+        numeroSaisi.clear() ;
+        cin >> numeroSaisi ; 
 
-        // Verification de l'existance du numero saisi dans la bibliotheque
-        if (VerifierNumero(numeroSaisie, getBilbiotheque())){
-            for(c = 0 ; c < nbImages ; c++){
-                // Chercher l'image ayant le numero correspondant
-                if(biblio["images"][c]["numero"].asInt() == numeroSaisie){
-                    // Affichage le cout correspondant
-                    cout << "Cout de l'image " << numeroSaisie << " : " << biblio["images"][c]["cout"].asDouble() << "€" << endl ;
-                    break ;
+        // Verifier le format du numero saisi
+        if(VerifierNumero(numeroSaisi, numero)){
+            // Verification de l'existance du numero saisi dans la bibliotheque
+            if (VerifierNumero(numero, getBilbiotheque())){
+                for(c = 0 ; c < nbImages ; c++){
+                    // Chercher l'image ayant le numero correspondant
+                    if(biblio["images"][c]["numero"].asInt() == numero){
+                        // Affichage le cout correspondant
+                        cout << "Cout de l'image " << numero << " : " << biblio["images"][c]["cout"].asDouble() << "€" << endl ;
+                        break ;
+                    }
                 }
-            }
+            }else{
+                cout << "Ce numero n'existe pas. " ;
+            }            
+        }else{
+            cout << "Format invalide. " ;
         }
-    }while(Continuer()) ;
+    }while(Continuer("Voulez-vous saisir un nouveau numero ? [Y/N] : ")) ;
 }
 
-/*Construire et afficher une sous-liste*/
+// Construire et afficher une sous-liste
 void Bibliotheque::ConstruireAfficherSousListe(){
     // Declaration des variables
     Json::Value biblio = getBilbiotheque() ;        // Objet Json
-    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images existantes dans la bibliotheque
     int choix ;                                     // Choix du critere
     int choixPlage ;                                // Choix de la plage de cout
-    int c, k ;                                      // Indices
-    int compteur = 0 ;                              // Compteur du nombre d'images choisies par critere
+    int c ;                                         // Indice
+    int compteur ;                                  // Compteur du nombre d'images choisies par critere
     string choixSource ;                            // Choix de la source
-    bool valideSource = false ;                     // Verification du choix de la source saisie par l'utilisateur
     double plageMin, plageMax ;                     // Plage de cout personalisee
     vector <string> listeSource ;                   // Liste des sources
 
     cout << "Veuillez choisir un critere : " << endl ;
-    cout << "1. Cout" << endl << "2. Source" << endl << endl ;
-
+    cout << "1. Cout" << endl << "2. Source" << endl ;
+    cout << "Votre choix : " ;
     // Saisie du critere et verification
     do{
         // Saisie le choix
@@ -145,11 +170,13 @@ void Bibliotheque::ConstruireAfficherSousListe(){
         // Critere choisi : Cout
         case 1 :
             do{
+                // Remise a zero le compteur
                 compteur = 0 ;
+
                 // Choix de la plage de cout
                 cout << "Veuillez choisir une plage de cout :" << endl ;
                 cout << "1. Gratuit" << endl << "2. Cout ≤ 99,99 €" << endl << "3. 100 ≤ Cout ≤ 999,99 €" << endl << "4. Cout > 1000 €" << endl << "5. Plage personnalisee" << endl ;
-
+                cout << "Votre choix : " ; 
                 // Saisie de la plage et validation
                 do{
                     cin >> choixPlage ;
@@ -157,157 +184,63 @@ void Bibliotheque::ConstruireAfficherSousListe(){
                         cout << "Choix invalide. Veuillez saisir '1', '2', '3', '4' ou '5' : " ;
                     }
                 }while((choixPlage != 1) && (choixPlage != 2) && (choixPlage != 3) && (choixPlage != 4) && (choixPlage != 5)) ;  
-                switch (choixPlage){
-                    // Sous-critere : Cout gratuit
-                    case 1 :
-                        // Affichage conditionnelle
-                        for (c = 0 ; c < nbImages ; c++){
-                            if (biblio["images"][c]["cout"].asDouble() == 0.0){
-                                cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
-                                cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                                cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                                cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                                cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                                cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                                compteur++ ;
-                            }
-                        }
-                        cout << "Il y a " << compteur << " images gratuites." << endl << endl ;
-                        break ;
 
-                    // Sous-critere : Cout ≤ 99,99 €
-                    case 2 :
-                        // Affichage conditionnelle
-                        for (c = 0 ; c < nbImages ; c++){
-                            if (biblio["images"][c]["cout"].asDouble() <= 99.99){
-                                cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
-                                cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                                cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                                cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                                cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                                cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                                compteur++ ;
-                            }
+                // Consitions personnalisee
+                if(choixPlage == 5){
+                    // Saisie de la plage de cout souhaitee
+                    cout << "Veuillez saisir la plage de cout souhaitee : " << endl ; 
+                    // Cout minimum
+                    cout << "Min : " ;
+                    do{
+                        cin >> plageMin ;
+                        if (plageMin < 0){
+                            cout << "Veuillez choisir une valeur positive ou nulle." << endl ;
                         }
-                        cout << "Il y a " << compteur << " images ayant le cout ≤ 99,99 €" << endl << endl ;
-                        break ;  
-
-                    // Sous-critere : 100 ≤ Cout ≤ 999,99 €
-                    case 3 :
-                        // Affichage conditionnelle
-                        for (c = 0 ; c < nbImages ; c++){
-                            if ((biblio["images"][c]["cout"].asDouble() >= 100) && (biblio["images"][c]["cout"].asDouble() <= 999.99)){
-                                cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
-                                cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                                cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                                cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                                cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                                cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                                compteur++ ;
-                            }
+                    }while(plageMin < 0) ;
+                    // Cout maximum
+                    cout << "Max : " ;
+                    do{
+                        cin >> plageMax ;
+                        if (plageMax < plageMin){
+                            cout << "Veuillez choisir une valeur > " << plageMin << endl ;
                         }
-                        cout << "Il y a " << compteur << " images ayant le cout entre 100 et 999,99 €" << endl << endl ;
-                        break ;  
-
-                    // Sous-critere : Cout > 1000 €
-                    case 4 :
-                        // Affichage conditionnelle
-                        for (c = 0 ; c < nbImages ; c++){
-                            if (biblio["images"][c]["cout"].asDouble() > 1000){
-                                cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
-                                cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                                cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                                cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                                cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                                cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                                compteur++ ;
-                            }
-                        }
-                        cout << "Il y a " << compteur << " images ayant le cout > 1000 €" << endl << endl ;
-                        break ;  
-
-                    // Sous-critere : Plage de cout personnalisee
-                    case 5 :
-                        // Saisie de la plage de cout souhaitee
-                        cout << "Veuillez saisir la plage de cout souhaitee : " << endl ; 
-                        // Cout minimum
-                        cout << "Min : " ;
-                        do{
-                            cin >> plageMin ;
-                            if (plageMin < 0){
-                                cout << "Veuillez choisir une valeur positive ou nulle." << endl ;
-                            }
-                        }while(plageMin < 0) ;
-                        // Cout maximum
-                        cout << "Max : " ;
-                        do{
-                            cin >> plageMax ;
-                            if (plageMax < plageMin){
-                                cout << "Veuillez choisir une valeur > " << plageMin << endl ;
-                            }
-                        }while(plageMax < plageMin) ;
-                        // Affichage conditionnelle
-                        for (c = 0 ; c < nbImages ; c++){
-                            if ((biblio["images"][c]["cout"].asDouble() >= plageMin) && (biblio["images"][c]["cout"].asDouble() <= plageMax)){
-                                cout << "Source : " << biblio["images"][c]["source"].asString() << endl ;
-                                cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                                cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                                cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                                cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                                cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                                compteur++ ;
-                            }
-                        }
-                        cout << "Il y a " << compteur << " images dans la plage de cout personnalisee" << endl << endl ;
-                        break ;
+                    }while(plageMax < plageMin) ;
+                    cout << "Sous liste cree : " << endl ;
+                    compteur = ConstruireAfficherSousListeCout(plageMin, plageMax) ;
+                // Conditions standards
+                }else{
+                    cout << "Sous liste cree : " << endl ;
+                    compteur = ConstruireAfficherSousListeCout(choixPlage) ;
                 }
-
+                cout << "Il y a " << compteur << " images dans la plage de cout personnalisee" << endl << endl ;
             }while(Continuer()) ;                
-
             break ;
 
         // Critere choisi : Source
         case 2 :
             // Creer la liste des sources
-            /*listeSource[0] = biblio["images"][0]["source"].asString() ;
-            for (c = 1 ; c < nbImages ; c++){                                               // Pourchaque element de la bibliotheque
-                for(k = 0 ; k <= (int)listeSource.max_size() ; k++){                        // Pour chaque element de la liste des sources
-                    if(biblio["images"][c]["source"].asString() == listeSource[k]){         // Si la source de l'element courant de la bibliotheque existe deja dans la liste
-                        break ;
-                    }else{                                                                  // Sinon     
-                        listeSource.push_back(biblio["images"][c]["source"].asString()) ;   // Ajouter la nouvelle source
-                    }
-                }
-            }
+            listeSource.clear() ;
+            listeSource = ListerSource(biblio) ;
             // Affichage des sources existantes
             cout << "Les sources existantes dans la bibliotheque : " << endl ;
-            for(c = 0 ; c < (int)listeSource.max_size() ; c++){
+            for(c = 0 ; c < (int)listeSource.size() ; c++){
                 cout << listeSource[c] << endl ;
-            }*/
+            }
 
             // Saisie et verification de la source souhaitee
             do{
+                // Remise a zero le compteur
+                compteur = 0 ;
                 // Saisie
                 cout << "Veuillez saisir une source souhaitee : " << endl ;
                 cin >> choixSource ;
-
-                // Affichage conditionnelle
-                for (c = 0 ; c < nbImages ; c++){
-                    if (biblio["images"][c]["source"].asString() == choixSource){
-                        cout << "Titre : " << biblio["images"][c]["titre"].asString() << endl ;
-                        cout << "Numero : " << biblio["images"][c]["numero"].asInt() << endl ;
-                        cout << "Cout : " << biblio["images"][c]["cout"].asDouble() << "€" << endl ;
-                        cout << "Permission : " << biblio["images"][c]["acces"].asString() << endl ;
-                        cout << "Date d'ajout : " << biblio["images"][c]["dateAjout"].asString() << endl ;
-                        cout << "Date de creation : " << biblio["images"][c]["dateCreation"].asString() << endl << endl ; 
-                        compteur++ ;
-                        valideSource = true ;
-                    }
-                }
-
                 // Si la source saisie est invalide
-                if(valideSource == false){
+                if(VerifierExistance(listeSource, choixSource) == false){
                     cout << "Source invalide. Veuillez saisir une autre source." << endl ;
+                // Affichage conditionnelle
+                }else{
+                    cout << "Sous liste cree : " << endl ;
+                    compteur = ConstruireAfficherSousListeSource(choixSource) ;
                 }
             }while(Continuer()) ;
 
@@ -318,41 +251,86 @@ void Bibliotheque::ConstruireAfficherSousListe(){
     }
 }
 
-/*Trier la bibliotheque suivant une critere choisie*/
+// Trier la bibliotheque suivant une critere choisie 
 void Bibliotheque::Trier(){
     // Declaration des variables
     Json::Value biblioTrie ;                                // Bibliotheque trie
     int choix ;                                             // Choix du critere pour trier la bibliotheque
 
-    do{
+    // Saisie et validation du choix de la critere pour trier
+    //do{
         // Choix du critere de tri
         cout << "Tri dans l'ordre decroissant" << endl ; 
-        cout << "1. Cout" << endl << "2. Titre" << endl << endl ;
+        cout << "1. Permission (acces)" << endl << "2. Chemin d'acces" << endl ;
+        cout << "3. Cout" << endl ;
+        // cout << "4. Date d'ajout" << endl << "5. Date de creation" << endl ;
+        cout << "4. Numero" << endl << "5. Source" << endl << "6. Titre" << endl ;
         cout << "Votre choix : " ; 
         do{
             // Saisie le choix
             cin >> choix ;
             // Validation du choix
-            if ((choix != 1) && (choix != 2)){
-                cout << "Choix invalide. Veuillez saisir '1' ou '2'." << endl ;
+            if ((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6)){
+                cout << "Choix invalide. Veuillez saisir '1', '2', '3', '4', '5', '6' : " ;
             }
-        }while((choix != 1) && (choix != 2)) ;
-        switch (choix){
-            case 1 :
+        }while((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6)) ;
+
+    // Affirmation du choix
+    switch(choix){
+            // Permission (acces)
+            case 1 : 
+                cout << "Critere choisi : Permission (acces) dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(1) ;
+                break ;
+            // Chemin d'acces   
+            case 2 : 
+                cout << "Critere choisi : Chemin d'acces dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(2) ;
+                break ;     
+            // Cout
+            case 3 : 
                 cout << "Critere choisi : Cout dans l'ordre decroissant" << endl ;
-                biblioTrie = TriElement("cout") ;
+                biblioTrie = Trier(3) ;
                 break ;
-            case 2 :
+            // Date d'ajout
+            /*case 4 :
+                cout << "Critere choisi : Date d'ajout dans l'ordre decroissant" << endl ;
+                break ;
+            // Date de creation
+            case 5 : 
+                cout << "Critere choisi : Date de creation dans l'ordre decroissant" << endl ;
+                break ;*/
+            // Numero
+            case 4 : 
+                cout << "Critere choisi : Numero dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(6) ;
+                break ;
+            // Source
+            case 5 : 
+                cout << "Critere choisi : Source dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(7) ;
+                break ;   
+            // Titre    
+            case 6 :
                 cout << "Critere choisi : Titre dans l'ordre decroissant" << endl ;
-                biblioTrie = TriElement("titre") ;
+                biblioTrie = Trier(8) ;
                 break ;
-            default :
+            default : 
                 break ;
         }
-    }while(Continuer()) ;
+
+        // Affichage
+        setBilbiotheque(biblioTrie) ;
+        AfficherDescripteurs() ;
+
+        /*// Sauvegardement
+        if (Continuer("Voulez-vous sauvegarder ce resultat ? [Y/N] : ")){
+            Sauvegarder() ;
+        }*/
+    //}while(Continuer("Voulez-vous continuer le tri ? [Y/N] : ")) ;
 }
 
-/*Ajouter une image*/
+// Ajouter une image
 void Bibliotheque::AjouterImage(){ 
     Json::Value biblio = getBilbiotheque() ; 
     int nbImages = biblio["images"].size() ;                            // Nombre d'images présent dans la bibliotheque avant l'ajout d'une nouvelle image  
@@ -453,11 +431,12 @@ void Bibliotheque::AjouterImage(){
     }    
 }
 
-/*Supprimer une image bibliotheque*/
+// Supprimer une image bibliotheque
 void  Bibliotheque::SupprimerImage(){
     // Declaration des variables
     Json::Value removed ;
     Json::Value biblio = getBilbiotheque() ;
+    string numeroSaisi ;
     int numero ;
     int nbImages = biblio["images"].size() ;     // Nombre d'images présent dans la bibliotheque avant la suppresion d'une nouvelle image
     
@@ -465,30 +444,36 @@ void  Bibliotheque::SupprimerImage(){
     do{
         // Saisir du numéro de l'image à supprimer
         cout << "Entrez le numero de l'image a supprimer"<< endl ;
-        cin >> numero ;
+        cin >> numeroSaisi ;
 
-
-        // Verifier l'existance du numero saisi
-        if(VerifierNumero(numero, getBilbiotheque())){
-            int indexImage = 0 ;
-            for(const auto & obj : biblio["images"]) {
-                if (obj["numero"] == numero) {
-                    // Supprésion dans le vecteur images des élèment associer à ce numéro
-                    biblio["images"].removeIndex(indexImage, &removed);
-                    // Mise à Jour sur le nombre d'image.
-                    biblio["nbImages"] = nbImages - 1 ;
+        // Verifier le format du numero saisi
+        if(VerifierNumero(numeroSaisi, numero)){
+            // Verifier l'existance du numero saisi
+            if(VerifierNumero(numero, getBilbiotheque())){
+                int indexImage = 0 ;
+                for(const auto & obj : biblio["images"]) {
+                    if (obj["numero"] == numero) {
+                        // Supprésion dans le vecteur images des élèment associer à ce numéro
+                        biblio["images"].removeIndex(indexImage, &removed);
+                        // Mise à Jour sur le nombre d'image.
+                        biblio["nbImages"] = nbImages - 1 ;
+                    }
+                    //Incrémenter l'index Images
+                    indexImage++;
                 }
-                //Incrémenter l'index Images
-                indexImage++;
+                
+                // Mise à jour de la bibliothèque
+                setBilbiotheque(biblio);
+            }else{
+                cout << "Ce numero n'existe pas. " ;
             }
-            
-            // Mise à jour de la bibliothèque
-            setBilbiotheque(biblio);
+        }else{
+            cout << "Format invalide. " ;
         }
-    }while(Continuer() && VerifierBibliotheque()) ;
+    }while(Continuer("Voulez-vous saisir un autre numero ? [Y/N] : ") && VerifierBibliotheque()) ;
 }
 
-/*Sauvegarder une bibliotheque*/
+// Sauvegarder une bibliotheque
 void Bibliotheque::Sauvegarder(){
     // Declaration des variables
     string nomNew ;                                                     // Nom du nouveau fichier
@@ -518,200 +503,363 @@ void Bibliotheque::Sauvegarder(){
     cout << "Bibliotheque sauvegardee." << endl ;
 }
 
-/*Saisie et validation de la date*/
-string Bibliotheque::SaisirDate(string& jour, string& mois, string& annee){
-    // Declaration de variable
-    bool valideDate = true ;            // Validation de la date
-    string date ;
-
-    // Initialisation
-    jour.clear() ;
-    mois.clear() ;
-    annee.clear() ;   
-
-    // Saisie et verification
-    do{
-        // Saisie - Jour
-        getline(cin, jour, '/') ;
-        // Saisie - Mois
-        getline(cin, mois, '/') ;
-        // Saisie - Annee
-        getline(cin, annee, '\n') ;
-
-        // Verification - Annee
-        // Si l'annee saisie est hors intervalle [1800, 2022]
-        if((stoi(annee) > 2022) || (stoi(annee) < 1800)){                                                                       
-            cout << "Annee invalide. Veuillez saisir une nouvelle valeur entre 1800 et 2022 : " ;
-            valideDate = false ;
-        }
-
-        // Verification - Mois
-        // Si le mois saisi est hors intervalle [1, 12]
-        if((stoi(mois) < 1) || (stoi(mois) > 12)){                                                                              
-            cout << "Mois invalide. Veuillez saisir une nouvelle valeur entre 1 et 12 : " ;
-            valideDate = false ;
-        }
-
-        // Verification - Jour
-        // Si le jour saisi est hors intervalle [1, 31]
-        if((stoi(jour) > 31) || (stoi(jour) < 1)){                                                                              
-            cout << "Jour invalide. Veuillez saisir une nouvelle valeur entre 1 et 31 : " ;
-            valideDate = false ;
-        // Mois = 2, Jour > 28
-        }else if((stoi(mois) == 2) && (stoi(jour) > 28)){    
-            // Mois = 2, Jour > 29 ou jour = 29 mais annee % 4 != 0                                                                   
-            if((stoi(jour) > 29) || ((stoi(jour) == 29) && ((stoi(annee) % 4) != 0))){                                          
-                cout << "Jour invalide. Veuillez saisir une nouvelle valeur < 29 : " ;
-                valideDate = false ;
-            }
-        // Si Jour = 31 mais Mois = 4, 6, 9, 11
-        }else if((stoi(jour) == 31) && ((stoi(mois) == 4) || (stoi(mois) == 6) || (stoi(mois) == 9) || (stoi(mois) == 11))){    
-            cout << "Jour invalide. Veuillez saisir une nouvelle valeur < 31 : " ;
-            valideDate = false ;
-        }
-    }while(valideDate == false) ;
-
-    // Generer la date
-    date = jour + "/" + mois + "/" + annee ;
-
-    return date ;
-}
-
-/*Continuer [Y/N]*/
-bool Bibliotheque::Continuer(){
-    // Declaration de variable
-    char decision ;
-
-    cout << "Voulez-vous continuer ? [Y/N]" << endl ;
-    do{
-        // Saisie
-        cin >> decision ;
-
-        // Verification
-        if ((decision != 'Y') && (decision != 'N')){
-            cout << "Choix invalide. Veuillez saisir 'Y' ou 'N'." << endl ;
-        }
-    } while((decision != 'Y') && (decision != 'N')) ;
-
-    // Retour
-    return (decision == 'Y') ;
-}
-
-/*Verifier l'extension ".json"*/
-void Bibliotheque::VerifierExtension(string& nom){
-    if (nom.length() < 6){                                          // Si la longueur du nom est < 6 (".json" = 5 caracteres)
-        nom += ".json" ;                                            // Ajouter l'extension
-    }else{                                                          // Sinon
-        if(nom.find(".json", nom.length()-5) != nom.length()-5){    // Si ".json" n'existe pas dans le nom saisi
-            nom += ".json" ;                                        // Ajouter l'extension
-        }
-    }    
-}
-
-/*Tri elementaire*/
-Json::Value Bibliotheque::TriElement(const string critere){
+/*Methodes supplementaires*/
+// Construire et afficher une sous-liste en fonction du cout (4 premieres options)
+int Bibliotheque::ConstruireAfficherSousListeCout(const int choix){
     // Declaration des variables
-    Json::Value biblioTrie ;                                                    // Initialiser la bibliotheque triee
-    Json::Value biblioNonTrie = getBilbiotheque() ;                             // Initialiser la bibliotheque non triee
-    int nbImages = biblioNonTrie["nbImages"].asInt() ;                          // Nombre d'images existantes dans la bibliotheque
-    int c, k ;                                                                  // Indices
-    char decision ;
-    vector<string> critereTri ;                                                 // Vecteur des criteres tries
-    vector<double> valNum ;                                                     // Pour convertir les chaines de caractere en valeurs numeriques
-    vector<string> critereNonTri ;                                              // Vecteur des criteres non tries
-    vector<int> indiceTrie ;                                                    // Vecteur des indices tries
+    int c ;                                         // Indice
+    int compteur = 0 ;                              // Compteur des images dans la sous liste
+    Json::Value biblio = getBilbiotheque() ;        // Bibliotheque
+    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images dans la bibliotheque
 
-    // Initialiser vecteur des titres
-    for (c = 0 ; c < nbImages ; c++){
-        critereNonTri.push_back(biblioNonTrie["images"][c][critere].asString()) ;
-    }
-
-    // Vecteur des indices du tri
-    critereTri = critereNonTri ;                                                // Initialiser le vecteur des couts tries
-    if(critere == "cout"){
-        // Conversion de chaine de caracteres en chiffres
-        transform(critereNonTri.begin(), critereNonTri.end(), back_inserter(valNum), [](const string & astr){ return stod( astr) ; } ) ;
-        // Trier les couts dan l'ordre decroissant
-        sort(valNum.begin(), valNum.end(), greater<double>()) ;                 
-        // Conversion de chiffres en chaine de caracteres
-        transform(valNum.begin(), valNum.end(), back_inserter(critereNonTri), [](const double & adbl){ return to_string( adbl) ; } ) ;
-    }else{
-        sort(critereTri.begin(), critereTri.end(), greater<string>()) ;         // Trier les couts dan l'ordre decroissant
-    }
-    
-    // Initialiser la premiere valeur du vecteur des indices du tri par l'indice du cout maximum
-    for (c = 0 ; c < nbImages ; c++){
-        if(critereNonTri[c] == critereTri[0]){
-            indiceTrie.push_back(c) ;
-            break ;
-        }
-    }
-
-    // Remplir le vecteur des indice du tri
-    for (c = 1 ; c < nbImages ; c++){                                           // Pour chaque element du vecteur des indices du vecteur des couts trie
-        for (k = 0 ; k < nbImages ; k++){                                       // Pour chaque element du vecteur des indices du vecteur des couts non trie
-            if ((critereTri[c] == critereNonTri[k])){                           // Si on retrouve le meme cout dans le vecteur trie que dans le vecteur non trie     
-                if ((*find(indiceTrie.begin(), indiceTrie.end(), k)) != k){     // Si l'indice correspondant n'est pas encore ecrit dans le vecteur des indices de tri                         
-                    indiceTrie.push_back(k) ;                                   // Ajouter cet indice
+    switch (choix){
+        // Sous-critere : Cout gratuit
+        case 1 :
+            // Affichage conditionnelle
+            for (c = 0 ; c < nbImages ; c++){
+                if (biblio["images"][c]["cout"].asDouble() == 0.0){
+                    // Affichage des descripteur
+                    AfficherDescripteurs(biblio, c) ;
+                    // Incrementation du compteur 
+                    compteur++ ;
                 }
             }
-        }
-    }
-    
-    //Tri de la bibliotheque
-    biblioTrie = biblioNonTrie ;                                                // Initialisation
-    for (c = 0 ; c < nbImages ; c++){                                           // Remplir la bibliotheque triee
-        biblioTrie["images"][c] = biblioNonTrie["images"][indiceTrie[c]] ;      
+            break ;
+
+        // Sous-critere : Cout ≤ 99,99 €
+        case 2 :
+            // Affichage conditionnelle
+            for (c = 0 ; c < nbImages ; c++){
+                if (biblio["images"][c]["cout"].asDouble() <= 99.99){
+                    // Affichage des descripteur
+                    AfficherDescripteurs(biblio, c) ;
+                    // Incrementation du compteur 
+                    compteur++ ;
+                }
+            }
+            break ;  
+
+        // Sous-critere : 100 ≤ Cout ≤ 999,99 €
+        case 3 :
+            // Affichage conditionnelle
+            for (c = 0 ; c < nbImages ; c++){
+                if ((biblio["images"][c]["cout"].asDouble() >= 100) && (biblio["images"][c]["cout"].asDouble() <= 999.99)){
+                    // Affichage des descripteur
+                    AfficherDescripteurs(biblio, c) ;
+                    // Incrementation du compteur 
+                    compteur++ ;
+                }
+            }
+            break ;  
+
+        // Sous-critere : Cout > 1000 €
+        case 4 :
+            // Affichage conditionnelle
+            for (c = 0 ; c < nbImages ; c++){
+                if (biblio["images"][c]["cout"].asDouble() > 1000){
+                    // Affichage des descripteur
+                    AfficherDescripteurs(biblio, c) ;
+                    // Incrementation du compteur 
+                    compteur++ ;
+                }
+            }
+            break ;  
+        default :
+            break ;
     }
 
-    // Affichage
-    setBilbiotheque(biblioTrie) ;
-    AfficherDescripteurs() ;
-    // Sauvegardement
-    cout << "Voulez-vous sauvegarder ce resultat ? [Y/N]" << endl ;
-    do{
-        cin >> decision ;
-        if ((decision != 'Y') && (decision != 'N')){
-            cout << "Choix invalide. Veuillez saisir 'Y' ou 'N'." << endl ;
+    // Retour
+    return compteur ;
+}
+
+// Construire et afficher une sous-liste en fonction du cout (derniere option)
+int Bibliotheque::ConstruireAfficherSousListeCout(double coutMin, double coutMax){
+    // Declaration des variables
+    int c ;                                         // Indice
+    int compteur = 0 ;                              // Compteur des images dans la sous liste
+    Json::Value biblio = getBilbiotheque() ;        // Bibliotheque
+    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images dans la bibliotheque
+
+    for (c = 0 ; c < nbImages ; c++){
+        if ((biblio["images"][c]["cout"].asDouble() >= coutMin) && (biblio["images"][c]["cout"].asDouble() <= coutMax)){
+            // Affichage des descripteur
+            AfficherDescripteurs(biblio, c) ;
+            // Incrementation du compteur 
+            compteur++ ;
         }
-    } while((decision != 'Y') && (decision != 'N')) ;
-    if (decision == 'Y'){
-        Sauvegarder() ;
+    }    
+
+    // Retour
+    return compteur ;
+} 
+
+// Construire et afficher une sous-liste en fonction de la source
+int Bibliotheque::ConstruireAfficherSousListeSource(const string source){
+    // Declaration des variables
+    int c ;                                         // Indice
+    int compteur = 0 ;                              // Compteur des images dans la sous liste
+    Json::Value biblio = getBilbiotheque() ;        // Bibliotheque
+    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images dans la bibliotheque
+
+    for (c = 0 ; c < nbImages ; c++){
+        if (biblio["images"][c]["source"].asString() == source){
+           // Affichage des descripteur
+            AfficherDescripteurs(biblio, c) ;
+            // Incrementation du compteur 
+            compteur++ ;
+        }
+    }
+
+    // Retour
+    return compteur ;
+}
+
+// Tri elementaire
+Json::Value Bibliotheque::Trier(const int choix){
+    // Declaration des variables
+    Json::Value biblioTrie ;                                // Initialiser la bibliotheque triee
+    Json::Value biblioNonTrie = getBilbiotheque() ;         // Initialiser la bibliotheque non triee
+    int nbImages = biblioNonTrie["nbImages"].asInt() ;      // Nombre d'images existantes dans la bibliotheque
+    int c ;                                                 // Indices
+    vector<int> indice ;                                    // Vecteur des indices pour le tri de la bibliotheque
+    vector<string> valeurTemp ;                             // Vecteur des valeurs temporaires
+    string jour, mois, annee ;                              // Jour, mois, annee pour le tri des dates
+    // Vecteurs des valeurs triees 
+    vector<string> texteTri ;                               // Type chaine de caracteres                     
+    vector<int> entierTri ;                                 // Type entier
+    vector<double> reelTri ;                                // Type reel
+    // Vecteurs des valeurs non triees 
+    vector<string> texteNonTri ;                            // Type chaine de caracteres
+    vector<int> entierNonTri ;                              // Type entier
+    vector<double> reelNonTri ;                             // Type reel
+
+    // Initialisation
+    indice.clear() ;
+    valeurTemp.clear() ;
+    texteTri.clear() ;
+    entierTri.clear() ;
+    reelTri.clear() ;
+    texteNonTri.clear() ;
+    entierNonTri.clear() ;
+    reelNonTri.clear() ;
+
+    // Trier suivant le choix
+    switch(choix){
+        // Permission (acces)
+        case 1 : 
+            // Initialiser vecteur des permissions
+            for (c = 0 ; c < nbImages ; c++){
+                texteNonTri.push_back(biblioNonTrie["images"][c]["acces"].asString()) ;
+            }
+            indice = Trier(texteNonTri) ;        
+            break ;
+
+        // Chemin d'acces   
+        case 2 : 
+            // Initialiser vecteur des chemins d'acces
+            for (c = 0 ; c < nbImages ; c++){
+                texteNonTri.push_back(biblioNonTrie["images"][c]["cheminAcces"].asString()) ;
+            }
+            indice = Trier(texteNonTri) ;        
+            break ;     
+
+        // Cout
+        case 3 : 
+            // Initialiser vecteur des couts
+            for (c = 0 ; c < nbImages ; c++){
+                reelNonTri.push_back(biblioNonTrie["images"][c]["cout"].asDouble()) ;
+            }
+            indice = Trier(reelNonTri) ;
+            break ;
+
+        // Date d'ajout
+        case 4 :
+            // Initialiser vecteur des dates d'ajout
+            for (c = 0 ; c < nbImages ; c++){
+                valeurTemp.push_back(biblioNonTrie["images"][c]["dateAjout"].asString()) ;
+            }
+            // Inverser la position des elements de la date pour trier
+            for(c = 0 ; c < nbImages ; c++){
+                ExtraireDate(valeurTemp[nbImages - 1 - c], jour, mois, annee) ;
+                entierNonTri.push_back(stoi(annee + mois + jour)) ;
+            }
+            indice = Trier(entierNonTri) ;   
+            break ;
+
+        // Date de creation
+        case 5 : 
+            // Initialiser vecteur des dates de creation
+            for (c = 0 ; c < nbImages ; c++){
+                valeurTemp.push_back(biblioNonTrie["images"][c]["dateCreation"].asString()) ;
+            }
+            // Inverser la position des elements de la date pour trier
+            for(c = 0 ; c < nbImages ; c++){
+                ExtraireDate(valeurTemp[nbImages - 1 - c], jour, mois, annee) ;
+                cout << stoi(annee + mois + jour) << endl ;
+                entierNonTri.push_back(stoi(annee + mois + jour)) ;
+            }
+            indice = Trier(entierNonTri) ; 
+            break ;
+
+        // Numero
+        case 6 : 
+            // Initialiser vecteur des numeros
+            for (c = 0 ; c < nbImages ; c++){
+                entierNonTri.push_back(biblioNonTrie["images"][c]["numero"].asInt()) ;
+            }
+            indice = Trier(entierNonTri) ;          
+            break ;
+
+        // Source
+        case 7 : 
+            // Initialiser vecteur des sources
+            for (c = 0 ; c < nbImages ; c++){
+                texteNonTri.push_back(biblioNonTrie["images"][c]["titre"].asString()) ;
+            }
+            indice = Trier(texteNonTri) ;        
+            break ;   
+
+        // Titre    
+        case 8 :
+            // Initialiser vecteur des titres
+            for (c = 0 ; c < nbImages ; c++){
+                texteNonTri.push_back(biblioNonTrie["images"][c]["titre"].asString()) ;
+            }
+            indice = Trier(texteNonTri) ;
+            break ;
+
+        default : 
+            break ;
+    }
+
+    // Tri de la bibliotheque
+    biblioTrie = biblioNonTrie ;                                                // Initialisation
+    for (c = 0 ; c < nbImages ; c++){                                           // Remplir la bibliotheque triee
+        biblioTrie["images"][c] = biblioNonTrie["images"][indice[c]] ;      
     }
 
     // Retour
     return biblioTrie ;
 }
 
-/*Verifier l'existance d'un numero de l'image*/
-bool Bibliotheque::VerifierNumero(int& numero, const Json::Value biblio){
+// Determiner les indices des elements avant le tri (chaine de caracteres)
+vector<int> Bibliotheque::Trier(vector<double>valeurNonTri){
     // Declaration des variables
-    int c ;                                         // Indice
-    bool exist ;                                    // Verificaiton de l'existance du numero saisi
-    int nbImages = biblio["nbImages"].asInt() ;     // Nombre d'images existantes dans la bibliotheque
-     
-    // Verification de l'existance du numero saisi dans la bibliotheque
-    for (c = 0 ; c < nbImages ; c++){
-        // Si le numero existe
-        if (numero == getBilbiotheque()["images"][c]["numero"].asInt()){
-            exist = true ;
+    int c, k ;                      // Indices
+    vector<double> valeurTri ;      // Vecteur des valeurs triees
+    vector<int> indice ;            // Vecteur des indices pour le tri de la bibliotheque
+
+    // Initialiser le vecteur des titres tries 
+    valeurTri = valeurNonTri ;     
+
+    // Trier les titres dans l'ordre decroissant
+    sort(valeurTri.begin(), valeurTri.end(), greater<double>()) ; 
+
+    // Initialiser la premiere valeur du vecteur des indices du tri par l'indice du cout maximum
+    for (c = 0 ; c < (int)valeurTri.size() ; c++){
+        if(valeurNonTri[c] == valeurTri[0]){
+            indice.push_back(c) ;
+            break ;
         }
     }
 
-    // Si le numero n'existe pas
-    if (exist == false){
-        cout << "Le numero choisi n'existe pas." << endl ;
-    }
+    // Remplir le vecteur des indice du tri
+    for (c = 1 ; c < (int)valeurTri.size() ; c++){                      // Pour chaque element du vecteur des indices du vecteur des couts trie
+        for (k = 0 ; k < (int)valeurTri.size() ; k++){                  // Pour chaque element du vecteur des indices du vecteur des couts non trie
+            if ((valeurTri[c] == valeurNonTri[k])){                     // Si on retrouve le meme cout dans le vecteur trie que dans le vecteur non trie     
+                if ((*find(indice.begin(), indice.end(), k)) != k){     // Si l'indice correspondant n'est pas encore ecrit dans le vecteur des indices de tri                         
+                    indice.push_back(k) ;                               // Ajouter cet indice
+                }
+            }
+        }
+    }    
 
     // Retour
-    return exist ;
+    return indice ;
+}
+
+// Determiner les indices des elements avant le tri (reel)
+vector<int> Bibliotheque::Trier(vector<string>valeurNonTri){
+    // Declaration des variables
+    int c, k ;                      // Indices
+    vector<string> valeurTri ;      // Vecteur des valeurs triees
+    vector<int> indice ;            // Vecteur des indices pour le tri de la bibliotheque
+
+    // Initialiser le vecteur des titres tries 
+    valeurTri = valeurNonTri ;     
+             
+    // Trier les titres dans l'ordre decroissant
+    sort(valeurTri.begin(), valeurTri.end(), greater<string>()) ; 
+
+    // Initialiser la premiere valeur du vecteur des indices du tri par l'indice du cout maximum
+    for (c = 0 ; c < (int)valeurTri.size() ; c++){
+        if(valeurNonTri[c] == valeurTri[0]){
+            indice.push_back(c) ;
+            break ;
+        }
+    }
+
+    // Remplir le vecteur des indice du tri
+    for (c = 1 ; c < (int)valeurTri.size() ; c++){                      // Pour chaque element du vecteur des indices du vecteur des couts trie
+        for (k = 0 ; k < (int)valeurTri.size() ; k++){                  // Pour chaque element du vecteur des indices du vecteur des couts non trie
+            if ((valeurTri[c] == valeurNonTri[k])){                     // Si on retrouve le meme cout dans le vecteur trie que dans le vecteur non trie     
+                if ((*find(indice.begin(), indice.end(), k)) != k){     // Si l'indice correspondant n'est pas encore ecrit dans le vecteur des indices de tri                         
+                    indice.push_back(k) ;                               // Ajouter cet indice
+                }
+            }
+        }
+    }    
+
+    // Retour
+    return indice ;
+}
+
+// Determiner les indices des elements avant le tri (entier)
+vector<int> Bibliotheque::Trier(vector<int>valeurNonTri){
+    // Declaration des variables
+    int c, k ;                      // Indices
+    vector<int> valeurTri ;         // Vecteur des valeurs triees
+    vector<int> indice ;            // Vecteur des indices pour le tri de la bibliotheque
+
+    // Initialiser le vecteur des titres tries 
+    valeurTri = valeurNonTri ;     
+
+    // Trier les titres dans l'ordre decroissant
+    sort(valeurTri.begin(), valeurTri.end(), greater<int>()) ; 
+
+    // Initialiser la premiere valeur du vecteur des indices du tri par l'indice du cout maximum
+    for (c = 0 ; c < (int)valeurTri.size() ; c++){
+        if(valeurNonTri[c] == valeurTri[0]){
+            indice.push_back(c) ;
+            break ;
+        }
+    }
+
+    // Remplir le vecteur des indice du tri
+    for (c = 1 ; c < (int)valeurTri.size() ; c++){                      // Pour chaque element du vecteur des indices du vecteur des couts trie
+        for (k = 0 ; k < (int)valeurTri.size() ; k++){                  // Pour chaque element du vecteur des indices du vecteur des couts non trie
+            if ((valeurTri[c] == valeurNonTri[k])){                     // Si on retrouve le meme cout dans le vecteur trie que dans le vecteur non trie     
+                if ((*find(indice.begin(), indice.end(), k)) != k){     // Si l'indice correspondant n'est pas encore ecrit dans le vecteur des indices de tri                         
+                    indice.push_back(k) ;                               // Ajouter cet indice
+                }
+            }
+        }
+    }    
+
+    // Retour
+    return indice ;
 }
 /*Mettre a jour la bibliotheque suivant les droits d'acces*/
 void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
 
 }
 
-/*Veriffier bibliotheque vide ou invalide*/
+// Mettre a jour la bibliotheque suivant les droits d'acces
+void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
+
+}
+
+// Veriffier bibliotheque vide ou invalide
 bool Bibliotheque::VerifierBibliotheque(){
     // Si la biliotheque ne contient aucune image
     if(getBilbiotheque()["nbImages"].asInt() == 0){
