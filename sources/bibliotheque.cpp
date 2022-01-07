@@ -264,57 +264,61 @@ void Bibliotheque::Trier(){
         cout << "1. Permission (acces)" << endl << "2. Chemin d'acces" << endl ;
         cout << "3. Cout" << endl ;
         // cout << "4. Date d'ajout" << endl << "5. Date de creation" << endl ;
-        cout << "6. Numero" << endl << "7. Source" << endl << "8. Titre" << endl ;
+        cout << "4. Numero" << endl << "5. Source" << endl << "6. Titre" << endl ;
         cout << "Votre choix : " ; 
         do{
             // Saisie le choix
             cin >> choix ;
             // Validation du choix
-            if ((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6) && (choix != 7) && (choix != 8)){
-                cout << "Choix invalide. Veuillez saisir '1', '2', '3', '4', '5', '6', '7' ou '8' : " ;
+            if ((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6)){
+                cout << "Choix invalide. Veuillez saisir '1', '2', '3', '4', '5', '6' : " ;
             }
-        }while((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6) && (choix != 7) && (choix != 8)) ;
+        }while((choix != 1) && (choix != 2) && (choix != 3) && (choix != 4) && (choix != 5) && (choix != 6)) ;
 
     // Affirmation du choix
     switch(choix){
             // Permission (acces)
             case 1 : 
                 cout << "Critere choisi : Permission (acces) dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(1) ;
                 break ;
             // Chemin d'acces   
             case 2 : 
                 cout << "Critere choisi : Chemin d'acces dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(2) ;
                 break ;     
             // Cout
             case 3 : 
                 cout << "Critere choisi : Cout dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(3) ;
                 break ;
             // Date d'ajout
-            case 4 :
+            /*case 4 :
                 cout << "Critere choisi : Date d'ajout dans l'ordre decroissant" << endl ;
                 break ;
             // Date de creation
             case 5 : 
                 cout << "Critere choisi : Date de creation dans l'ordre decroissant" << endl ;
-                break ;
+                break ;*/
             // Numero
-            case 6 : 
+            case 4 : 
                 cout << "Critere choisi : Numero dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(6) ;
                 break ;
             // Source
-            case 7 : 
+            case 5 : 
                 cout << "Critere choisi : Source dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(7) ;
                 break ;   
             // Titre    
-            case 8 :
+            case 6 :
                 cout << "Critere choisi : Titre dans l'ordre decroissant" << endl ;
+                biblioTrie = Trier(8) ;
                 break ;
             default : 
                 break ;
         }
 
-        // Tri de la bibliotheque
-        biblioTrie = Trier(choix) ;
         // Affichage
         setBilbiotheque(biblioTrie) ;
         AfficherDescripteurs() ;
