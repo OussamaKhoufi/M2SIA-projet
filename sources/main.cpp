@@ -28,6 +28,7 @@ void menuTraitementImage(Bibliotheque objBiblio,int numImage){
 		cout << endl << "4. Filtrage avec Gaussien" << endl;
 		cout << endl << "5. Filtrage avec Gradient en x (Sobel)" << endl;
 		cout << endl << "6. Filtrage avec Gradient en y (Sobel)" << endl;
+		cout << endl << "7. Transformée de Hough" << endl;
 		cout << endl << "0. Retour au menu Image" << endl;
 		cout << endl << "Tapez votre choix et appuiyez sur Entrée : " << endl;
 		cin >> choixTraitement;

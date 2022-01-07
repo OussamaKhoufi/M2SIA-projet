@@ -8,3 +8,4 @@ vector<int> ImageHistogramme(const Mat image) ;										// Histogramme
 Mat ImageConvolution(const Mat image, const Mat filtre) ;							// Produit de convolution entre deux images
 Mat ImageNiveauGris(const Mat image) ;												// Convertir une image en niveau de gris
 Mat GenererFiltre(const int typeFiltre) ;											// Generer les filtres
+Mat TransformeedeHough(const Mat image);                                            // Transformée de Hough

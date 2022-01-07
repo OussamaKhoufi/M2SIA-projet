@@ -1,0 +1,45 @@
+{
+   "images" : [
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/dangerous_dance.png",
+         "cout" : 9,
+         "dateAjout" : "28/12/2021",
+         "dateCreation" : "23/02/1996",
+         "numero" : 1,
+         "source" : "nasa",
+         "titre" : "test"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/brick_wall.jpg",
+         "cout" : 950,
+         "dateAjout" : "02/01/2022",
+         "dateCreation" : "\n02/01/2022",
+         "numero" : 2,
+         "source" : "Internet$",
+         "titre" : "Wall"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/face3.png",
+         "cout" : 100,
+         "dateAjout" : "02/01/2022",
+         "dateCreation" : "\n02/01/2022",
+         "numero" : 3,
+         "source" : "EEA",
+         "titre" : "facade"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/facade.png",
+         "cout" : 900,
+         "dateAjout" : "07/01/2022",
+         "dateCreation" : "\n07/01/2022",
+         "numero" : 4,
+         "source" : "EEA",
+         "titre" : "Facade"
+      }
+   ],
+   "nbImages" : 4
+}

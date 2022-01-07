@@ -25,3 +25,8 @@
 - modification cout => meme probleme que ajout Image 
 - modification des dates => meme probleme que ajout Image 
 ************
+////
+****Menu principale****
+taper un caractere arrêt du programme
+****Menu Gestion ****
+taper un caractere boucle infini

@@ -50,4 +50,5 @@ class Bibliotheque{
         bool VerifierBibliotheque() ;                                       // Veriffier bibliotheque vide ou invalide
 };
 
+template < typename Type > std::string to_str (const Type & t);
 #endif // BIBLIOTHEQUE_H

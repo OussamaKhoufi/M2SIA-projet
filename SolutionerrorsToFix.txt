@@ -10,7 +10,7 @@
 
 
 
-* Cout : (Ajouter Image) (MALIK)
+* Cout : (Ajouter Image) (MALIK)effectué
 - saisie d'un chifre + caractère (exemple : 5d ) => pas d'erreur
 - saisie d'un caractère => arret immédiat du programme 
 => Definir cout comme un string, verifier puis reconvertir en double
@@ -37,16 +37,16 @@
 => Corriger le cin et verifier les caracteres apres la saisie
 
 -------
-**** supprime Image **** (MALIK)
+**** supprime Image **** (MALIK)effectué
 - numéro n'existe pas => deux messages d'erreur pas un seul  
 => 2 appels de la fct
 
 -------
-**** supprime Image **** (MALIK)
+**** supprime Image **** (MALIK)effectué
 - saisie d'un caractère au lieu d'un numéro => boucle infini : "Choix invalide. Veuillez saisir 'Y' ou 'N'."
 => Verifier le numero avant // Verifier l'existance du numero saisi
 -------
-**** supprime Image **** (MALIK)
+**** supprime Image **** (MALIK) effectué
 - pas de message indicant que la suppression a été bien effectué 
 => Ajouter un message d'erreur
 

@@ -351,6 +351,32 @@ void Bibliotheque::Trier(){
         }
     }while(Continuer()) ;
 }
+/* Convertission les données variable en string*/
+template < typename Type > std::string to_str (const Type & t)
+{
+  ostringstream os;
+  os << t;
+  // conversion en string
+  return os.str ();
+}
+
+/*Affichage des messages*/
+void AffichageMessageSupprimer(char st){
+    switch (st)
+    {
+    // Accès
+    case 'A':
+        
+        break;
+    /*case '':
+        break;
+    */
+    default:
+        cout << "Acces (P : Publique, R : Restreint) : " ;
+        break;
+    }
+
+} 
 
 /*Ajouter une image*/
 void Bibliotheque::AjouterImage(){ 
@@ -365,6 +391,8 @@ void Bibliotheque::AjouterImage(){
     float nbReel ;                                                      // Variable pour la saisie en nombre reel
     string texte ;                                                      // Variable pour la saisie en texte
 
+    string strcout;
+    string cout_input;
     // Boucle de saisir
     do{
         // Saisie : Acces
@@ -392,9 +420,23 @@ void Bibliotheque::AjouterImage(){
         }while (exist == false) ;
         biblio["images"][indice]["cheminAcces"] = texte ;
 
-        // Saisie : Cout
-        cout << "Cout : " ;
-        cin >> nbReel ;           
+        // Saisie : Cout 
+        //Vérification de la présence de caractère ou non dans la saisie.
+        do{
+        
+            cout << "Cout : " ;
+            cin >> cout_input;
+                
+            //Coversion du flux d'entrée (numero d'entree en string) en floattant
+            stringstream ss(cout_input); 
+            ss  >> nbReel;
+            
+            //Conversion en string            
+            strcout = to_str(nbReel) ;
+
+        }while(strcout != cout_input);
+        
+
         biblio["images"][indice]["cout"] = nbReel ;
 
         // Saisie : Date de creation
@@ -458,15 +500,29 @@ void  Bibliotheque::SupprimerImage(){
     // Declaration des variables
     Json::Value removed ;
     Json::Value biblio = getBilbiotheque() ;
-    int numero ;
+    string numero_input ;
+    string strNumero;
+
+    int numero;    
     int nbImages = biblio["images"].size() ;     // Nombre d'images présent dans la bibliotheque avant la suppresion d'une nouvelle image
-    
 
+            
+           
     do{
-        // Saisir du numéro de l'image à supprimer
-        cout << "Entrez le numero de l'image a supprimer"<< endl ;
-        cin >> numero ;
 
+        // Saisie par l'utilisateur du numero de l'image à supprimer. Vérification de la présence de caractère ou non dans la saisie.
+        do{
+            cout << "Entrez le numero de l'image a supprimer"<< endl;
+            cin >> numero_input;
+                
+            //Coversion du flux d'entrée (numero d'entree en string) en int
+            stringstream ss(numero_input); 
+            ss  >> numero;
+            //Conversion en string
+            strNumero = to_str(numero);
+
+        }while(strNumero != numero_input);
+        
 
         // Verifier l'existance du numero saisi
         if(VerifierNumero(numero, getBilbiotheque())){
@@ -475,6 +531,7 @@ void  Bibliotheque::SupprimerImage(){
                 if (obj["numero"] == numero) {
                     // Supprésion dans le vecteur images des élèment associer à ce numéro
                     biblio["images"].removeIndex(indexImage, &removed);
+                    cout <<"l image" << numero << "a ete supprimee"<<endl;
                     // Mise à Jour sur le nombre d'image.
                     biblio["nbImages"] = nbImages - 1 ;
                 }

@@ -482,6 +482,12 @@ void Image::TraitementImage(int choixTraitement){
         imageResultat = ImageConvolution(image, GenererFiltre(5)) ;
         titreFigure="Filtrage avec Gradient en y (Sobel)";
         break;
+
+        case 7 : 
+        imageResultat = TransformeedeHough(image) ;
+        titreFigure="Transformée de Hough";
+        break;
+
         default :
         cout << "Error Choix Traitement d'image!";
         break; 
