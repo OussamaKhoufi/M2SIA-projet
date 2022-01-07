@@ -849,12 +849,8 @@ vector<int> Bibliotheque::Trier(vector<int>valeurNonTri){
     // Retour
     return indice ;
 }
+
 /*Mettre a jour la bibliotheque suivant les droits d'acces*/
-void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
-
-}
-
-// Mettre a jour la bibliotheque suivant les droits d'acces
 void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
 
 }

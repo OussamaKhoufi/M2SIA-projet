@@ -16,11 +16,11 @@
 #bibliotheque.o : bibliotheque.cpp bibliotheque.h
 #	g++ -c bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs
 
-binaries = main.o image.o bibliotheque.o traitementImage.o exec_main.exe
+binaries = main.o image.o bibliotheque.o traitementImage.o complement.o exec_main.exe
 
 all: clean $(binaries)
 
-exec_main.exe : main.o image.o bibliotheque.o traitementImage.o 
+exec_main.exe : main.o image.o bibliotheque.o traitementImage.o complement.o
 	g++ -o exec_main.exe main.o bibliotheque.o image.o traitementImage.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 
 main.o : ./sources/main.cpp 
@@ -33,6 +33,9 @@ bibliotheque.o : ./sources/bibliotheque.cpp ./headers/bibliotheque.h
 	g++ -c ./sources/bibliotheque.cpp -W -Wall -ljsoncpp -lstdc++fs
 traitementImage.o : ./sources/traitementImage.cpp ./headers/traitementImage.h 
 	g++ -c ./sources/traitementImage.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
+complement.o : ./sources/complement.cpp ./headers/complement.h 
+	g++ -c ./sources/complement.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
+
 
 .PHONY: clean
 
