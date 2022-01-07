@@ -19,13 +19,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <experimental/filesystem>
-// Plot
-// #include <matplot/matplot.h>
-// #include "./../headers/matplotlibcpp.h"
-// namespace plt = matplotlibcpp ;
+// Autres librairies
 #include "traitementImage.h"
 #include "bibliotheque.h"
-// using namespace plt ;
+#include "complement.h"
+
 using namespace std ;
 using namespace rapidjson ;
 using namespace cv ;
@@ -33,22 +31,23 @@ using namespace cv ;
 
 class Image{
     private :
-        string _cheminAccesContenu ;
-		string _source ;
-		string _titre ;
-		int _numero ;
-		double _cout ;
-		string _acces ;
-		string _dateAjout ;
-		string _dateCreation ;
-		string _cheminJson ;
-		int _numeroJson ;
+        string _cheminAccesContenu ;			// Chemin acces a l'image
+		string _source ;						// Source de l'image
+		string _titre ;							// Titre de l'image
+		int _numero ;							// Numero de l'image
+		double _cout ;							// Cout de l'image
+		string _acces ;							// Permission d'acces de l'image
+		string _dateAjout ;						// Date d'ajout de l'image
+		string _dateCreation ;					// Date de creation de l'image
+		string _cheminJson ;					// Chemin vers la bibliotheque contenant l'image
+		int _numeroJson ;						// Indice de l'image dans la bibiotheque
+
     public :
         /*Constructeurs*/
-        Image();														// Constructeur vide
-		Image(string chemin) ;											// Constructeur avec un chemin d'acces a la bibliotheque donne
-		Image(string chemin, int num) ;									// Constructeur avec un chemin d'acces a la bibliotheque et un numero de l'image donnes
-		Image(Bibliotheque objBiblio,int numImage);
+        Image();																			// Constructeur vide
+		Image(string chemin) ;																// Constructeur avec un chemin d'acces a la bibliotheque donne
+		Image(string chemin, int num) ;														// Constructeur avec un chemin d'acces a la bibliotheque et un numero de l'image donnes
+		Image(Bibliotheque objBiblio,int numImage) ;										// Constructeur avec un objet bibliotheque et le numero de l'image connu 
         
 		/*Getter*/
         string getCheminAccesContenu() const ;      										// Chemin d'acces
@@ -59,8 +58,8 @@ class Image{
 		string getAcces() const ;                   										// Permission
 		string getDateAjout() const ;               										// Date d'ajout
 		string getDateCreation() const ;            										// Date de creation
-		string getCheminJson() const ;														// Chemin Json
-		int getNumeroJson() const ;															// Numero Json
+		string getCheminJson() const ;														// Chemin vers la bibliotheque
+		int getNumeroJson() const ;															// Numero de l'image dans la bibiotheque
 
         /*Setters*/
         void setCheminAccesContenu(const string cheminAccesContenu) ;   					// Chemin d'acces
@@ -74,19 +73,24 @@ class Image{
 		void setCheminJson(const string cheminJson) ;										// Chemin Json
 		void setNumeroJson(const int numeroJson) ;											// Numero Json
 
-        /*Methodes principales*/
+        /*Methodes*/
         void AfficherContenuImage() ;														// Afficher le contenu de l'image
         void AfficherDescripteurImage() ;													// Afficher les descripteurs de l'image
         void ModifierDescripteurImage() ;													// Modifier un descripteur de l'image
-        void TraitementImage(int choixTraitement) ;															// Traitement de l'image
-
-		/*Methodes supplementaires*/					
-		void VerifierExtension(string& nom) ;												// Verifier l'extension ".json"
-		bool Continuer() ;																	// Continuer [Y/N]
-		bool VerifierNumero(int& numero, const Json::Value biblio) ;						// Verifier l'existance du numero d'image 
-		string SaisirDate(string& jour, string& mois, string& annee) ;						// Saisir une date
-		void ExtraireDate(const string date, string& jour, string& mois, string& annee) ;	// Extraire jour, mois, annee a partir d'une date
-		
+        void TraitementImage(int choixTraitement) ;											// Traitement de l'image
 } ;
 
 #endif // IMAGE_H
+
+
+
+
+
+
+
+
+// Plot
+// #include <matplot/matplot.h>
+// #include "./../headers/matplotlibcpp.h"
+// namespace plt = matplotlibcpp ;
+// using namespace plt ;

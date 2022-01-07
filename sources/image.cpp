@@ -1,40 +1,66 @@
 #include "./../headers/image.h"
 
+/*Constructeurs*/
+// Constructeur vide
 Image::Image()
 {
-    int nb ;                                                                    // Numero de l'image
-    Json::Value images ;
-    Json::Reader reader ;
-    ifstream bibliotheque_file("../DATA/Bibliothèques/bibliotheque.json", ios::in) ;          // Charger le contenu du fichier json 
-    reader.parse(bibliotheque_file, images) ;                                   // Importer le contenu a l'objet Json
+    bool validation ;                                                                   // Validation du numero saisi
+    int numero ;                                                                        // Numero de l'image
+    int c ;                                                                             // Indice
+    string nbSaisi ;                                                                    // Numero saisi par l'utilisateur
+    Json::Value biblio ;                                                                // Objet Json
+    Json::Reader reader ;                                                               // Variable pour la lecture d'un fichier Json
 
-    cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
+    ifstream bibliotheque_file("./DATA/Bibliothèques/bibliotheque.json", ios::in) ;     // Charger le contenu du fichier json 
+    reader.parse(bibliotheque_file, biblio) ;                                           // Importer le contenu a l'objet Json
+
+    // Saisir et valider le numero de l'image
+    cout << "Veuillez saisir le numero de l'image souhaitee : " ; 
     do{
-        // Saisir le numero de l'image
-        cin >> nb ;
-        // Verifier le numero de l'image et saisir un autre numero en cas d'erreur
-        if ((nb > images["nbImages"].asInt()-1) || (nb < 0)){
-            cout << "Veuillez saisir un numero valide !" << endl ;
+        // Saisie
+        cin >> nbSaisi ;
+        // Validation du format
+        validation = VerifierNumero(nbSaisi, numero) ;
+        if(validation){
+            // Validation du numero
+            validation = VerifierNumero(numero, biblio) ;
+            if(validation == false){
+                cout << "Ce numero n'existe pas. Veuillez saisir un autre numero : " ;
+            }
+        }else{
+            cout << "Format invalide. Veuillez saisir un autre numero : " ;
         }
-    }while((nb > images["nbImages"].asInt()-1) || (nb < 0)) ;
-    _cheminAccesContenu = images["images"][nb]["cheminAcces"].asString() ;
-    _source = images["images"][nb]["source"].asString() ;
-    _titre = images["images"][nb]["titre"].asString() ;
-    _numero = images["images"][nb]["numero"].asInt() ;
-    _cout = images["images"][nb]["cout"].asDouble() ;
-    _acces = images["images"][nb]["acces"].asString() ;
-    _dateAjout = images["images"][nb]["dateAjout"].asString() ;
-    _dateCreation = images["images"][nb]["dateCreation"].asString() ;
-    _cheminJson = "./DATA/bibliotheque.json" ;
-    _numeroJson = nb ;
+    }while(validation == false) ;
+
+    // Affectuer des attributs
+    for(c = 0 ; c < biblio["nbImages"].asInt() ; c++){
+        if(biblio["images"][c]["numero"].asInt() == numero){
+            _cheminAccesContenu = biblio["images"][c]["cheminAcces"].asString() ;
+            _source = biblio["images"][c]["source"].asString() ;
+            _titre = biblio["images"][c]["titre"].asString() ;
+            _numero = biblio["images"][c]["numero"].asInt() ;
+            _cout = biblio["images"][c]["cout"].asDouble() ;
+            _acces = biblio["images"][c]["acces"].asString() ;
+            _dateAjout = biblio["images"][c]["dateAjout"].asString() ;
+            _dateCreation = biblio["images"][c]["dateCreation"].asString() ;
+            _cheminJson = "./DATA/bibliotheque.json" ;
+            _numeroJson = c ;
+            break ;
+        }
+    }
+
 }
 
+// Constructeur avec le chemin vers la bibliotheque connu
 Image::Image(string chemin)
 {
-    int nb ;                                                                    // Numero de l'image
+    bool validation ;                                                           // Validation du numero saisi
+    int numero ;                                                                // Numero de l'image
+    int c ;                                                                     // Indice
     bool exist ;                                                                // Variable pour verifier l'existance du fichier
     char decision ;                                                             // Condition d'arret de la boucle
-    Json::Value images ;                                                        // Objet Json
+    string nbSaisi ;                                                            // Numero saisi par l'utilisateur
+    Json::Value biblio ;                                                        // Objet Json
     Json::Reader reader ;                                                       // Variable pour la lecture du fichier Json
 
     VerifierExtension(chemin) ;                                                 // Verifier l'existance de l'xension ".json"
@@ -44,83 +70,122 @@ Image::Image(string chemin)
         // Verifier l'existance du fichier
         if (exist){                                                             // Si le fichier existe
             ifstream bibliotheque_file(chemin, ios::in) ;                       // Charger le contenu du fichier json 
-            reader.parse(bibliotheque_file, images) ;                           // Importer le contenu a l'objet Json
+            reader.parse(bibliotheque_file, biblio) ;                           // Importer le contenu a l'objet Json
 
-            // Saisie et verification du numero de l'image
+            // Saisir et valider le numero de l'image
+            cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
             do{
-                cout << "Veuillez saisir le numero de l'image souhaitee : " << endl ; 
-                cin >> nb ;
-            }while(VerifierNumero(nb, images) == false) ;
-        
-            // Prendre les descripteurs de l'image
-            _cheminAccesContenu = images["images"][nb]["cheminAcces"].asString() ;
-            _source = images["images"][nb]["source"].asString() ;
-            _titre = images["images"][nb]["titre"].asString() ;
-            _numero = images["images"][nb]["numero"].asInt() ;
-            _cout = images["images"][nb]["cout"].asDouble() ;
-            _acces = images["images"][nb]["acces"].asString() ;
-            _dateAjout = images["images"][nb]["dateAjout"].asString() ;
-            _dateCreation = images["images"][nb]["dateCreation"].asString() ;
-            _cheminJson = chemin ;
-            _numeroJson = nb ;
-        } else{                                                                 // Sinon
-            // Saisir un autre chemin
+                // Saisie
+                cin >> nbSaisi ;
+                // Validation du format
+                validation = VerifierNumero(nbSaisi, numero) ;
+                if(validation){
+                    // Validation du numero
+                    validation = VerifierNumero(numero, biblio) ;
+                    if(validation == false){
+                        cout << "Ce numero n'existe pas. Veuillez saisir un autre numero : " ;
+                    }
+                }else{
+                    cout << "Format invalide. Veuillez saisir un autre numero : " ;
+                }
+            }while(validation == false) ;
+
+            // Affectuer des attributs
+            for(c = 0 ; c < biblio["nbImages"].asInt() ; c++){
+                if(biblio["images"][c]["numero"].asInt() == numero){
+                    _cheminAccesContenu = biblio["images"][c]["cheminAcces"].asString() ;
+                    _source = biblio["images"][c]["source"].asString() ;
+                    _titre = biblio["images"][c]["titre"].asString() ;
+                    _numero = biblio["images"][c]["numero"].asInt() ;
+                    _cout = biblio["images"][c]["cout"].asDouble() ;
+                    _acces = biblio["images"][c]["acces"].asString() ;
+                    _dateAjout = biblio["images"][c]["dateAjout"].asString() ;
+                    _dateCreation = biblio["images"][c]["dateCreation"].asString() ;
+                    _cheminJson = chemin ;
+                    _numeroJson = c ;
+                    break ;
+                }
+            }
+        // Si le fichier n'existe pas
+        }else{                                                                  
             cout << "Fichier non exist" << endl ;
-            if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliothèques/" << endl ;
-                cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/Bibliothèques/" + chemin ;                     // Completer le chemin
+            // Si l'utilisateur veut continuer
+            if (Continuer("Voulez-vous saisir un autre chemin ? [Y/N] : ")){                                                   
+                cout << "Nouveau chemin : ./DATA/Bibliothèques/" ;
+                // Saisir un autre chemin
+                cin >> chemin ;             
+                // Completer le chemin                                    
+                chemin = "./DATA/Bibliothèques/" + chemin ;                     
                 decision = 'Y' ;                                 
             }
         }
     }while(decision == 'Y') ;    
 }
 
-Image::Image(string chemin, int num){
+// Constructeur avec le chemin vers la bibliotheque et le numero de l'image connus
+Image::Image(string chemin, int numero){
     // Declaration des variables 
     bool exist ;                                                                // Variable pour verifier l'existance du fichier
     char decision ;                                                             // Condition d'arret de la boucle
-    Json::Value images ;                                                        // Objet Json
+    int c ;                                                                     // Indice
+    string numeroSaisi ;                                                        // Numero saisi par l'utilisateur
+    Json::Value biblio ;                                                        // Objet Json
     Json::Reader reader ;                                                       // Variable pour la lecture du fichier Json
+
     VerifierExtension(chemin) ;                                                 // Verifier l'existance de l'xension ".json"
     exist = experimental::filesystem::exists(chemin) ;                          // Verifier l'existace du fichier
+
     do{
         decision = 'N' ;
         if (exist){                                                             // Si le fichier existe
             ifstream bibliotheque_file(chemin, ios::in) ;                       // Charger le contenu du fichier json 
-            reader.parse(bibliotheque_file, images) ;                           // Importer le contenu a l'objet Json
+            reader.parse(bibliotheque_file, biblio) ;                           // Importer le contenu a l'objet Json
 
             // Verifier le numero de l'image et saisir un autre numero en cas d'erreur
-            while(VerifierNumero(num, images) == false){
-                cout << "Veuillez saisir un numero valide !" << endl ;
-                cin >> num ;
+            while(VerifierNumero(numero, biblio) == false){
+                cout << "Ce numero n'existe pas. Veuillez saisir un autre numero : " ; 
+                do{
+                    cin >> numeroSaisi ;
+                    if(VerifierNumero(numeroSaisi, numero) == false){
+                        cout << "Format invalide. Veuillez saisir un autre numero : " ;
+                    }
+                }while(VerifierNumero(numeroSaisi, numero) == false) ;
             }
 
-            // Prendre les descripteurs de l'image
-            _cheminAccesContenu = images["images"][num]["cheminAcces"].asString() ;
-            _source = images["images"][num]["source"].asString() ;
-            _titre = images["images"][num]["titre"].asString() ;
-            _numero = images["images"][num]["numero"].asInt() ;
-            _cout = images["images"][num]["cout"].asDouble() ;
-            _acces = images["images"][num]["acces"].asString() ;
-            _dateAjout = images["images"][num]["dateAjout"].asString() ;
-            _dateCreation = images["images"][num]["dateCreation"].asString() ;
-            _cheminJson = chemin ;
-            _numeroJson = num ;
-        } else{
-            // Saisir un autre chemin
+            // Affectuer des attributs
+            for(c = 0 ; c < biblio["nbImages"].asInt() ; c++){
+                if(biblio["images"][c]["numero"].asInt() == numero){
+                    _cheminAccesContenu = biblio["images"][c]["cheminAcces"].asString() ;
+                    _source = biblio["images"][c]["source"].asString() ;
+                    _titre = biblio["images"][c]["titre"].asString() ;
+                    _numero = biblio["images"][c]["numero"].asInt() ;
+                    _cout = biblio["images"][c]["cout"].asDouble() ;
+                    _acces = biblio["images"][c]["acces"].asString() ;
+                    _dateAjout = biblio["images"][c]["dateAjout"].asString() ;
+                    _dateCreation = biblio["images"][c]["dateCreation"].asString() ;
+                    _cheminJson = chemin ;
+                    _numeroJson = c ;
+                    break ;
+                }
+            }
+        // Si le fichier n'existe pas
+        }else{                                                                  
             cout << "Fichier non exist" << endl ;
-            if (Continuer()){                                                   // Si l'utilisateur veut continuer
-                cout << "Veuillez saisir un autre chemin : ./DATA/Bibliothèques/" ;
-                cin >> chemin ;                                                 // Saisie du nouveau chemin
-                chemin = "./DATA/Bibliothèques/" + chemin ;                     // Completer le chemin
-                decision = 'Y' ;
+            // Si l'utilisateur veut continuer
+            if (Continuer("Voulez-vous saisir un autre chemin ? [Y/N] : ")){                                                   
+                cout << "Nouveau chemin : ./DATA/Bibliothèques/" ;
+                // Saisir un autre chemin
+                cin >> chemin ;             
+                // Completer le chemin                                    
+                chemin = "./DATA/Bibliothèques/" + chemin ;                     
+                decision = 'Y' ;                                 
             }
         }
     }while(decision == 'Y') ;    
 }
 
-Image::Image(Bibliotheque objBiblio,int numImage){
+// Constructeur avec un objet bibliotheque et le numero de l'image connu 
+Image::Image(Bibliotheque objBiblio, int numImage){
     Json::Value biblioJson = objBiblio.getBilbiotheque();
     _cheminAccesContenu = biblioJson["images"][numImage]["cheminAcces"].asString() ;
     _source = biblioJson["images"][numImage]["source"].asString() ;
@@ -135,7 +200,7 @@ Image::Image(Bibliotheque objBiblio,int numImage){
     //Image::AfficherDescripteurImage();
 }
 
-/*Getter*/
+/*Getters*/
 // Chemin d'acces
 string Image::getCheminAccesContenu() const {
     return _cheminAccesContenu ;
@@ -220,7 +285,7 @@ void Image::setNumeroJson(const int numeroJson){
 }
 
 /*Methodes principales*/
-/*Afficher le contenu de l'image*/
+// Afficher le contenu de l'image
 void Image::AfficherContenuImage(){
     // Declaration des variables
     Mat image = imread(getCheminAccesContenu()) ;   // Charger l'image
@@ -233,7 +298,7 @@ void Image::AfficherContenuImage(){
     destroyWindow(windowName) ; 
 }
 
-/*Afficher les descripteurs de l'image*/
+// Afficher les descripteurs de l'image
 void Image::AfficherDescripteurImage(){
     // Afficher les descripteurs de l'image
     cout << "Chemin :" << getCheminAccesContenu() << endl ;
@@ -246,15 +311,13 @@ void Image::AfficherDescripteurImage(){
     cout << "Date de creation :" << getDateCreation() << endl ;
 }
 
-/*Modifier les descripteurs de l'image*/
+// Modifier les descripteurs de l'image
 void Image::ModifierDescripteurImage(){
     // Declaration des variables
     bool validation ;                                                               // Variable booleenne pour valider les conditions
-    char decision ;                                                                 // Decision [Y/N]
     int choix ;                                                                     // Choix des actions  
-    int c ;                                                                         // Indice
     int nouveauEntier ;                                                             // Variable pour la saisie des numeros entiers
-    float nouveauReel ;                                                             // Variable pour la saisie des numeros reels      
+    double nouveauReel ;                                                            // Variable pour la saisie des numeros reels      
     string nouveauTexte ;                                                           // Variable pour la saisie des chaines de caractere
     string jourAjout, moisAjout, anneeAjout ;                                       // Jour, Mois, Annee d'ajout
     string jourCreation, moisCreation, anneeCreation ;                              // Jour, Mois, Annee de creation
@@ -273,7 +336,7 @@ void Image::ModifierDescripteurImage(){
         cout << "1.Chemin" << endl << "2.Source" << endl << "3.Titre" << endl ;
         cout << "4.Numero" << endl << "5.Cout" << endl << "6.Acces" << endl ;
         cout << "7.Date d'ajout" << endl << "8.Date de Creation" << endl ;
-        cout << "Veuillez saisir un choix : " << endl ;
+        cout << "Veuillez saisir un choix : " ;
         do{
             // Saisir le choix
             cin >> choix ;
@@ -291,7 +354,7 @@ void Image::ModifierDescripteurImage(){
                 cout << "Veuillez saisir le nouveau chemin : ./DATA/Images/" ;
                 do{
                     cin >> nouveauTexte ;
-                    nouveauTexte = "./DATA/Images/" + nouveauTexte ;                       // Completer le chemin
+                    nouveauTexte = "./DATA/Images/" + nouveauTexte ;                // Completer le chemin
                     validation = experimental::filesystem::exists(nouveauTexte) ;   // Verifier l'existace du fichier
                     if(validation == false){
                         cout << "Ce fichier n'existe pas. Veuillez saisir un nouveau nom valide : ./DATA/Images/" ;
@@ -326,21 +389,22 @@ void Image::ModifierDescripteurImage(){
             // Numero
             case 4 :
                 // Saisir et verifier le nouveau numero
-                cout << "Veuillez saisir le nouveau numero : " << endl ;
+                cout << "Veuillez saisir le nouveau numero : " ;
                 do{
-                    validation = false ;
                     // Saisie
-                    cin >> nouveauEntier ;
-                    // Verification
-                    for(c = 0 ; c < biblio["nbImages"].asInt() ; c++){
-                        // Si le numero existe deja
-                        if(nouveauEntier == biblio["images"][c]["numero"].asInt()){
-                            cout << "Ce numero existe deja. Veuillez choisir un autre numero : " << endl ;
+                    cin >> nouveauTexte ;
+                    if(VerifierNumero(nouveauTexte, nouveauEntier)){
+                        if(VerifierNumero(nouveauEntier, biblio)){
+                            cout << "Ce numero existe deja. Veuillez saisir un autre numero : " ;
+                            validation = false ;
+                        }else{
                             validation = true ;
-                            break ;
-                        }
+                        }                            
+                    }else{
+                        cout << "Format invalide. Veuillez saisir un autre numero : " ;
+                        validation = false ;
                     }
-                }while(validation) ;
+                }while(validation == false) ;
                 
                 // Modifier le numero de l'image
                 setNumero(nouveauEntier) ;
@@ -350,13 +414,15 @@ void Image::ModifierDescripteurImage(){
             // Cout
             case 5 :
                 // Saisir le nouveau cout
-                cout << "Veuillez saisir le nouveau cout : " << endl ;
+                cout << "Veuillez saisir le nouveau cout : " ;
                 do{
-                    cin >> nouveauReel ;
-                    if(nouveauReel < 0){
-                        cout << "Saisie incorrecte. Veuillez saisir un cout positif : " << endl ;
+                    // Saisie
+                    cin >> nouveauTexte ;
+                    validation = VerifierCout(nouveauTexte, nouveauReel) ;
+                    if(validation == false){
+                        cout << "Cout invalide. Veuillez saisir un autre cout : " ;
                     }
-                }while(nouveauReel < 0) ;
+                }while(validation == false) ;
                 
                 // Modifier le cout de l'image
                 setCout(nouveauReel) ;
@@ -383,20 +449,21 @@ void Image::ModifierDescripteurImage(){
             case 7 :
                 // Saisir et valider la nouvelle date d'ajout
                 do{
-                    validation = false ;
                     // Saisie
-                    cout << "Veuillez saisir la nouvelle date d'ajout (dd/mm/yyyy) : " << endl ;
+                    cout << "Veuillez saisir la nouvelle date d'ajout (dd/mm/yyyy) : " ;
                     nouveauTexte = SaisirDate(jourAjout, moisAjout, anneeAjout) ;
 
                     // Extraction de la date de creation pour comparer avec la date d'ajout (dd/mm/yyyy)
                     ExtraireDate(biblio["images"][getNumeroJson()]["dateCreation"].asString(), jourCreation, moisCreation, anneeCreation) ;
 
                     // Verification
-                    if(stoi(anneeAjout + moisAjout + anneeAjout) - (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
+                    if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
                         cout << "La date d'ajout doit etre superieure ou egale a la date de creation. Veuillez reessayer." << endl ;
+                        validation = false ;
+                    }else{
                         validation = true ;
                     }                    
-                }while(validation) ;
+                }while(validation == false) ;
 
                 // Modifer la date d'ajout de l'image
                 setDateAjout(nouveauTexte) ;
@@ -409,7 +476,7 @@ void Image::ModifierDescripteurImage(){
                 do{
                     validation = false ;
                     // Saisie
-                    cout << "Veuillez saisir la nouvelle date de creation (dd/mm/yyyy) : " << endl ;
+                    cout << "Veuillez saisir la nouvelle date de creation (dd/mm/yyyy) : " ;
                     nouveauTexte = SaisirDate(jourCreation, moisCreation, anneeCreation) ;
 
                     // Extraction de la date de creation pour comparer avec la date d'ajout (dd/mm/yyyy)
@@ -430,19 +497,10 @@ void Image::ModifierDescripteurImage(){
             // Defaut
             default : break ;
         }
-    }while(Continuer()) ;
+    }while(Continuer("Voulez-vous modifier autre descripteur ? [Y/N] : ")) ;
 
     // Sauvegarder
-    cout << "Voulez-vous sauvegarder ce resultat ? [Y/N]" << endl ;
-    do{
-        // Saisir la decision
-        cin >> decision ;
-        // Verifier la decision
-        if((decision != 'Y') && (decision != 'N')){
-            cout << "Choix invalide ! Veuillez saisir 'Y' ou 'N' : " << endl ;
-        }
-    }while((decision != 'Y') && (decision != 'N')) ;
-    if(decision == 'Y'){
+    if(Continuer("Voulez-vous sauvegarder ce resultat ? [Y/N] : ")){
         biblio_new.open(getCheminJson()) ;              // Ouvrir le fichier
         biblio_new << styledWriter.write(biblio) ;      // Ecrire    
         biblio_new.close() ;                            // Fermer le fichier
@@ -450,7 +508,7 @@ void Image::ModifierDescripteurImage(){
     }
 }
 
-/*Traitement de l'image*/
+// Traitement de l'image
 void Image::TraitementImage(int choixTraitement){
     Mat image = imread(getCheminAccesContenu()) ;                                   // Charger l'image
     Mat image_channels[3] ;                                                         // Canaux de l'image
@@ -459,7 +517,7 @@ void Image::TraitementImage(int choixTraitement){
     
     switch (choixTraitement){
         case 1 :
-        imageResultat = ImageNiveauGris(image) ;
+        imageResultat = ImageMonochrome(image) ;
         titreFigure="Image en Niveau de Gris";
         break;
         case 2 : 
@@ -494,172 +552,5 @@ void Image::TraitementImage(int choixTraitement){
     destroyWindow(titreFigure) ;
 
 }
-
-/*Methodes supplementaires*/
-/*Verifier l'extension ".json"*/
-void Image::VerifierExtension(string& nom){
-    if (nom.length() < 6){                                          // Si la longueur du nom est < 6 (".json" = 5 caracteres)
-        nom += ".json" ;                                            // Ajouter l'extension
-    }else{                                                          // Sinon
-        if(nom.find(".json", nom.length()-5) != nom.length()-5){    // Si ".json" n'existe pas dans le nom saisi
-            nom += ".json" ;                                        // Ajouter l'extension
-        }
-    }    
-}
-
-/*Continuer [Y/N]*/
-bool Image::Continuer(){
-    // Declaration de variable
-    char decision ;
-
-    cout << "Voulez-vous continuer ? [Y/N]" << endl ;
-    do{
-        // Saisie
-        cin >> decision ;
-
-        // Verification
-        if ((decision != 'Y') && (decision != 'N')){
-            cout << "Choix invalide. Veuillez saisir 'Y' ou 'N'." << endl ;
-        }
-    } while((decision != 'Y') && (decision != 'N')) ;
-
-    // Retour
-    return (decision == 'Y') ;
-}
-
-/*Verifier l'existance du numero d'image*/
-bool Image::VerifierNumero(int& numero, const Json::Value biblio){
-    // Declaration des variables
-    int c ;                                             // Indice
-    bool exist ;                                        // Verificaiton de l'existance du numero saisi
-    int nbImages = biblio["nbImages"].asInt() ;         // Nombre d'images existantes dans la bibliotheque
-     
-    // Verification de l'existance du numero saisi dans la bibliotheque
-    for (c = 0 ; c < nbImages ; c++){
-        // Si le numero existe
-        if (numero == biblio["images"][c]["numero"].asInt()){
-            exist = true ;
-        }
-    }
-
-    // Si le numero n'existe pas
-    if (exist == false){
-        cout << "Le numero choisi n'existe pas." << endl ;
-    }
-
-    // Retour
-    return exist ;    
-}
-
-/*Saisie et validation de la date*/
-string Image::SaisirDate(string& jour, string& mois, string& annee){
-    // Declaration des variables
-    bool valideDate = true ;            // Validation de la date
-    string date ;                       // Date
-
-    // Initialisation
-    jour.clear() ;
-    mois.clear() ;
-    annee.clear() ;
-
-    // Saisie et verification
-    do{
-        // Saisie - Jour
-        getline(cin, jour, '/') ;
-        // Saisie - Mois
-        getline(cin, mois, '/') ;
-        // Saisie - Annee
-        getline(cin, annee, '\n') ;
-
-        // Verification - Annee
-        // Si l'annee saisie est hors intervalle [1800, 2022]
-        if((stoi(annee) > 2022) || (stoi(annee) < 1800)){                                                                       
-            cout << "Annee invalide. Veuillez saisir une nouvelle valeur entre 1800 et 2022 : " ;
-            valideDate = false ;
-        }
-
-        // Verification - Mois
-        // Si le mois saisi est  hors intervalle [1, 12]
-        if((stoi(mois) < 1) || (stoi(mois) > 12)){                                                                              
-            cout << "Mois invalide. Veuillez saisir une nouvelle valeur entre 1 et 12 : " ;
-            valideDate = false ;
-        }
-
-        // Verification - Jour
-        // Si le jour saisi est hors intervalle [1, 31]
-        if((stoi(jour) > 31) || (stoi(jour) < 1)){                                                                              
-            cout << "Jour invalide. Veuillez saisir une nouvelle valeur entre 1 et 31 : " ;
-            valideDate = false ;
-        // Si Mois = 2, Jour > 28
-        }else if((stoi(mois) == 2) && (stoi(jour) > 28)){                 
-            // Mois = 2, Jour > 29 ou jour = 29 mais annee % 4 != 0                                                      
-            if((stoi(jour) > 29) || ((stoi(jour) == 29) && ((stoi(annee) % 4) != 0))){                                          
-                cout << "Jour invalide. Veuillez saisir une nouvelle valeur < 29 : " ;
-                valideDate = false ;
-            }
-        // Jour = 31 mais Mois = 4, 6, 9, 11
-        }else if((stoi(jour) == 31) && ((stoi(mois) == 4) || (stoi(mois) == 6) || (stoi(mois) == 9) || (stoi(mois) == 11))){    
-            cout << "Jour invalide. Veuillez saisir une nouvelle valeur < 31 : " ;
-            valideDate = false ;
-        }
-    }while(valideDate == false) ;
-
-    // Generer la date
-    date = jour + "/" + mois + "/" + annee ;
-
-    return date ;
-}
-
-/*Extraire jour, mois, annee a partir d'une date*/
-void Image::ExtraireDate(const string date, string& jour, string& mois, string& annee){
-    // Initialisation
-    jour.clear() ;
-    mois.clear() ;
-    annee.clear() ;
-
-    // Jour de creation : caracteres aux indices 0 et 1
-    jour.push_back(date.at(0)) ; 
-    jour.push_back(date.at(1)) ;
-
-    // Mois de creation : caracteres aux indices 3 et 4
-    mois.push_back(date.at(3)) ;
-    mois.push_back(date.at(4)) ;
-
-    // Annee de creation : 4 dernieres caracteres
-    annee.push_back(date.at(6)) ;
-    annee.push_back(date.at(7)) ;
-    annee.push_back(date.at(8)) ;
-    annee.push_back(date.at(9)) ;    
-}
-
-
-/*Filtre median*/
-
-
-
-
-/*
-            do{
-                // Saisir le numero de l'image
-                cin >> nb ;
-                // Verifier le numero de l'image et saisir un autre numero en cas d'erreur
-                if ((nb > images["nbImages"].asInt()-1) || (nb < 0)){
-                    cout << "Veuillez saisir un numero valide !" << endl ;
-                }
-            }while((nb > images["nbImages"].asInt()-1) || (nb < 0)) ;
-*/
-
-/*
-            do{
-                if ((num > images["nbImages"].asInt()-1) || (num < 0)){
-                    cout << "Veuillez saisir un numero valide !" << endl ;
-                    cin >> num ;
-                }
-            }while((num > images["nbImages"].asInt()-1) || (num < 0)) ;
-*/
-
-
-
-
 
 

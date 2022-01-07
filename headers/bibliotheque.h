@@ -1,6 +1,7 @@
 #ifndef BIBLIOTHEQUE_H
 #define BIBLIOTHEQUE_H
 
+// Systeme
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,6 +13,8 @@
 #include <jsoncpp/json/json.h>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+// Fonctions complementaires
+#include "complement.h"
 
 using namespace rapidjson ;
 using namespace std ;
@@ -19,35 +22,40 @@ using namespace std ;
 
 class Bibliotheque{
     private :      
-        Json::Value _bibliotheque ;                                         // Objet de type Json
+        Json::Value _bibliotheque ;                                             // Objet de type Json
         string _cheminJson;
     public :
         /*Constructeurs*/
-        Bibliotheque() ;                                                    // Constructeur vide 
-        Bibliotheque(string nom) ;                                          // Constructeur avec le nom de la bibliotheque donnee par l'utilisateur
-        Bibliotheque(const Json::Value bibliotheque) ;                      // Constructeur avec un objet Json
-        /*Getter*/
+        Bibliotheque() ;                                                        // Constructeur vide 
+        Bibliotheque(string nom) ;                                              // Constructeur avec le nom de la bibliotheque donnee par l'utilisateur
+        Bibliotheque(const Json::Value bibliotheque) ;                          // Constructeur avec un objet Json
+        /*Getters*/
         Json::Value getBilbiotheque() const ;
         string getCheminJson() const;
-        /*Setter*/
+        /*Setters*/
         void setBilbiotheque(const Json::Value bibliotheque) ;
+        void setCheminJson(const string cheminJson) ;
 
         /*Methodes principales*/
-        void AfficherDescripteurs() ;                                       // Afficher la liste des descripteurs
-        void AfficherCout() ;                                               // Affichage le cout d'une image
-        void ConstruireAfficherSousListe() ;                                // Construire et afficher une sous-liste
-        void Trier() ;                                                      // Trier la bibliotheque suivant une critere
-        void AjouterImage() ;                                               // Ajouter une image dans la bibliotheque
-        void SupprimerImage() ;                                             // Supprimer une image de la bibliotheque
-        void Sauvegarder() ;                                                // Sauvegarder une bibliotheque
+        void AfficherDescripteurs() ;                                                   // Afficher la liste des descripteurs
+        void AfficherDescripteurs(const Json::Value bibliotheque, const int indice) ;   // Afficher la liste des descripteurs d'une partie indiquee de la bibliotheque
+        void AfficherCout() ;                                                           // Affichage le cout d'une image
+        void ConstruireAfficherSousListe() ;                                            // Construire et afficher une sous-liste
+        void Trier() ;                                                                  // Trier la bibliotheque suivant une critere
+        void AjouterImage() ;                                                           // Ajouter une image dans la bibliotheque
+        void SupprimerImage() ;                                                         // Supprimer une image de la bibliotheque
+        void Sauvegarder() ;                                                            // Sauvegarder une bibliotheque
 
         /*Methodes supplementaires*/
-        string SaisirDate(string& jour, string& mois, string& annee) ;      // Saisir et valider la date
-        bool Continuer() ;                                                  // Continuer [Y/N]
-        void VerifierExtension(string& nom) ;                               // Verifier l'extension ".json"
-        Json::Value TriElement(const string critere) ;                      // Tri elementaire
-        bool VerifierNumero(int& numero, const Json::Value biblio) ;        // Verifier l'existance d'un numero de l'image
-        bool VerifierBibliotheque() ;                                       // Veriffier bibliotheque vide ou invalide
+        int ConstruireAfficherSousListeCout(const int choix) ;                          // Construire et afficher une sous-liste en fonction du cout (4 premieres options)
+        int ConstruireAfficherSousListeCout(double coutMin, double coutMax) ;           // Construire et afficher une sous-liste en fonction du cout (derniere option)
+        int ConstruireAfficherSousListeSource(const string source) ;                    // Construire et afficher une sous-liste en fonction de la source
+        Json::Value Trier(const int choix) ;
+        vector<int> Trier(vector<double>valeurNonTri) ;                                 // Determiner les indices des elements avant le tri (reel)
+        vector<int> Trier(vector<string>valeurNonTri) ;                                 // Determiner les indices des elements avant le tri (chaine de caracteres)
+        vector<int> Trier(vector<int>valeurNonTri) ;                                    // Determiner les indices des elements avant le tri (entier)
+        bool VerifierBibliotheque() ;                                                   // Veriffier bibliotheque vide ou invalide
+        void majBiblioSuivantDroitAcces(/*bool droitAcces*/);                           // Mettre à jour la bibliotheque suivant le droit d'acces
 };
 
 #endif // BIBLIOTHEQUE_H
