@@ -48,6 +48,7 @@ class Bibliotheque{
         Json::Value TriElement(const string critere) ;                      // Tri elementaire
         bool VerifierNumero(int& numero, const Json::Value biblio) ;        // Verifier l'existance d'un numero de l'image
         bool VerifierBibliotheque() ;                                       // Veriffier bibliotheque vide ou invalide
+        void majBiblioSuivantDroitAcces(/*bool droitAcces*/);                   // Mettre à jour la bibliotheque suivant le droit d'acces
 };
 
 #endif // BIBLIOTHEQUE_H
