@@ -209,7 +209,7 @@ bool VerifierNumero(const int numero, const Json::Value biblio){
     return exist ;
 }
 
-// Verifier l'existance d'un numero de l'image
+// Verifier le format du numero (entier)
 bool VerifierNumero(const string saisie, int& numero){
     // Declaration des variables
     bool validation = true ;
@@ -231,6 +231,41 @@ bool VerifierNumero(const string saisie, int& numero){
     // Retour 
     return validation ;
 }    
+
+// Verifier le format du numero (reel)
+bool VerifierNumero(const string saisie, double& numero){
+    // Declaration des variables
+    bool validation = true ;
+    int c ;
+    int s = 0 ;
+
+    // Verifier le format de chaque caractere du numero 
+    for(c = 0 ; c < (int)saisie.size() ; c++){
+        // Si le caractere n'est pas un chiffre
+        if(isdigit(saisie[c]) == false){
+            // Si ce caractere ne se trouve pas dans la premiere position et si c'est le separateur du reel
+            if((c > 0) && (saisie[c] == '.')){
+                // S'il y a plus d'un separateur
+                if(s++ > 1){
+                    validation = false ;
+                    break ;
+                }
+            // Si ce n'est pas le separateur du reel
+            }else{
+                validation = false ;
+                break ;
+            }
+        }
+    }
+
+    // Si le format est valide
+    if(validation){
+        numero = stod(saisie) ;
+    }
+
+    // Retour 
+    return validation ;
+}                      	       
 
 // Verifier l'existance d'un element dans un vecteur
 bool VerifierExistance(vector<string> vecteur, string valeur){

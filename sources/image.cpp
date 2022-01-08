@@ -188,8 +188,8 @@ Image::Image(string chemin, int numero){
 // Constructeur avec un objet bibliotheque et le numero de l'image connu 
 Image::Image(Bibliotheque objBiblio, int numImage){
     // Declaration des variables
-    int c ;
-    Json::Value biblioJson = objBiblio.getBilbiotheque();
+    int c  ;                                                    // Indice
+    Json::Value biblioJson = objBiblio.getBilbiotheque();       // Bibliotheque
 
     // Affectuer des attributs
     for(c = 0 ; c < biblioJson["nbImages"].asInt() ; c++){
@@ -202,7 +202,7 @@ Image::Image(Bibliotheque objBiblio, int numImage){
             _acces = biblioJson["images"][c]["acces"].asString() ;
             _dateAjout = biblioJson["images"][c]["dateAjout"].asString() ;
             _dateCreation = biblioJson["images"][c]["dateCreation"].asString() ;
-            _cheminJson = objBiblio.getCheminJson() ; ;
+            _cheminJson = objBiblio.getCheminJson() ;
             _numeroJson = c ;
             break ;
         }
@@ -320,18 +320,17 @@ void Image::AfficherDescripteurImage(){
     cout << "Date de creation :" << getDateCreation() << endl ;
 }
 
-// Modifier les descripteurs de l'image
+// Modifier les descripteurs de l'image (saisie & affichage)
 void Image::ModifierDescripteurImage(){
     // Declaration des variables
     bool validation ;                                                               // Variable booleenne pour valider les conditions
-    int choix ;                                                                     // Choix des actions  
-    int nouveauEntier ;                                                             // Variable pour la saisie des numeros entiers
-    double nouveauReel ;                                                            // Variable pour la saisie des numeros reels      
+    int choix ;                                                                     // Choix des actions (entier)
+    string saisie ;                                                                 // Choix des actions (chaine de caracteres)    
     string nouveauTexte ;                                                           // Variable pour la saisie des chaines de caractere
     string jourAjout, moisAjout, anneeAjout ;                                       // Jour, Mois, Annee d'ajout
     string jourCreation, moisCreation, anneeCreation ;                              // Jour, Mois, Annee de creation
     string dateAjout, dateCreation ;                                                // Date d'ajout, date de creation
-    ofstream biblio_new ;                                                           // Objet fichier
+    vector<int> erreur ;                                                            // Vecteur des erreurs
     Json::StyledWriter styledWriter;                                                // Writer Json
     Json::Value biblio ;                                                            // Objet Json
     Json::Reader reader ;                                                           // Variable pour la lecture du fichier Json
@@ -347,175 +346,352 @@ void Image::ModifierDescripteurImage(){
         cout << "7.Date d'ajout" << endl << "8.Date de Creation" << endl ;
         cout << "Veuillez saisir un choix : " ;
         do{
+            validation = true ;
             // Saisir le choix
-            cin >> choix ;
-            // Verifier le choix
-            if(choix != 1 && choix != 2 && choix != 3 && choix != 4 && choix != 5 && choix != 6 && choix != 7 && choix != 8){
-                cout << "Choix invalide ! Veuillez saisir un autre choix : " << endl ;
+            cin >> saisie ;
+            if(VerifierNumero(saisie, choix)){
+                // Verifier le choix
+                if(choix != 1 && choix != 2 && choix != 3 && choix != 4 && choix != 5 && choix != 6 && choix != 7 && choix != 8){
+                    cout << "Veuillez saisir un choix compris entre 1 et 8 : " ;
+                    validation = false ;
+                }
+            }else{
+                cout << "Le choix doit etre un entier. Veuillez saisir un choix valide : " ;
+                validation = false ;
             }
-        }while(choix != 1 && choix != 2 && choix != 3 && choix != 4 && choix != 5 && choix != 6 && choix != 7 && choix != 8) ;
+        }while(validation == false) ;
 
         // Modification des descripteurs
-        switch(choix){
-            // Chemin
+        do{
+            erreur.clear() ;
+            switch (choix){
+            // Chemin d'acces   
             case 1 :
-                // Saisir le nouveau chemin
-                cout << "Veuillez saisir le nouveau chemin : ./DATA/Images/" ;
-                do{
-                    cin >> nouveauTexte ;
-                    nouveauTexte = "./DATA/Images/" + nouveauTexte ;                // Completer le chemin
-                    validation = experimental::filesystem::exists(nouveauTexte) ;   // Verifier l'existace du fichier
-                    if(validation == false){
-                        cout << "Ce fichier n'existe pas. Veuillez saisir un nouveau nom valide : ./DATA/Images/" ;
-                    }
-                }while(validation == false) ;
-
-                // Modifier le chemin de l'image
-                setCheminAccesContenu(nouveauTexte) ;
-                biblio["images"][getNumeroJson()]["cheminAcces"] = nouveauTexte ;
-                break ;
-
+                cout << "Veuillez saisir le nouveau chemin d'acces : ./DATA/Images/" ;
+                break ;             
             // Source
             case 2 :
-                // Saisir la nouvelle source
-                cout << "Veuillez saisir la nouvelle source : " << endl ;
-                cin >> nouveauTexte ;
-                // Modifier la source de l'image
-                setSource(nouveauTexte) ;
-                biblio["images"][getNumeroJson()]["source"] = nouveauTexte ;
+                cout << "Veuillez saisir la nouvelle source : " ;
                 break ;
-
             // Titre
             case 3 :
-                // Saisir le nouveau titre
-                cout << "Veuillez saisir le nouveau titre : " << endl ;
-                cin >> nouveauTexte ;
-                // Modifier le titre de l'image
-                setTitre(nouveauTexte) ;
-                biblio["images"][getNumeroJson()]["titre"] = nouveauTexte ;
+                cout << "Veuillez saisir le nouveau titre : " ;
                 break ;
-
             // Numero
-            case 4 :
-                // Saisir et verifier le nouveau numero
+            case 4 : 
                 cout << "Veuillez saisir le nouveau numero : " ;
-                do{
-                    // Saisie
-                    cin >> nouveauTexte ;
-                    if(VerifierNumero(nouveauTexte, nouveauEntier)){
-                        if(VerifierNumero(nouveauEntier, biblio)){
-                            cout << "Ce numero existe deja. Veuillez saisir un autre numero : " ;
-                            validation = false ;
-                        }else{
-                            validation = true ;
-                        }                            
-                    }else{
-                        cout << "Format invalide. Veuillez saisir un autre numero : " ;
-                        validation = false ;
-                    }
-                }while(validation == false) ;
-                
-                // Modifier le numero de l'image
-                setNumero(nouveauEntier) ;
-                biblio["images"][getNumeroJson()]["numero"] = nouveauEntier ;
                 break ;
-            
             // Cout
-            case 5 :
-                // Saisir le nouveau cout
+            case 5 : 
                 cout << "Veuillez saisir le nouveau cout : " ;
-                do{
-                    // Saisie
-                    cin >> nouveauTexte ;
-                    validation = VerifierCout(nouveauTexte, nouveauReel) ;
-                    if(validation == false){
-                        cout << "Cout invalide. Veuillez saisir un autre cout : " ;
-                    }
-                }while(validation == false) ;
-                
-                // Modifier le cout de l'image
-                setCout(nouveauReel) ;
-                biblio["images"][getNumeroJson()]["cout"] = nouveauReel ;
                 break ;
-
-            // Acces
+            // Acces (Permission)
             case 6 :
-                // Saisir le nouveau acces
-                cout << "Veuillez saisir le nouveau acces (P : Publique, R : Restreint) : " << endl ;
-                do{
-                    cin >> nouveauTexte ;
-                    if((nouveauTexte != "P") && (nouveauTexte != "R")){
-                        cout << "Saisie incorrecte. Veuillez saisir 'P' (Publique) ou 'R' (Restreint) : " << endl ;
-                    }
-                }while((nouveauTexte != "P") && (nouveauTexte != "R")) ;
-                
+                cout << "Veuillez saisir le nouveua acces : " ;
+                break ;
+            // Date d'ajout
+            case 7 :
+                cout << "Veuillez saisir la nouvelle date d'ajout : " ;
+                break ;
+            //Date de creation     
+            case 8 :
+                cout << "Veuillez saisir la nouvelle date de creation : " ;
+            default:
+                break;
+            }
+            cin >> nouveauTexte ;
+            erreur = ModifierDescripteurImage(choix, nouveauTexte, biblio) ;
+            ModifierDescripteurImage(erreur) ;
+        }while((int)erreur.size() != 0) ;
+
+    }while(Continuer("Voulez-vous effectuer autres modifications ? [Y/N] : ")) ;
+}
+
+// Modifier un descripteur de l'image (verification et affectation)
+vector<int> Image::ModifierDescripteurImage(const int choix, const string saisie, Json::Value& biblio){
+    // Declaration des variables
+    int c ;                                                 // Indice
+    int nouveauEntier ;                                     // Nouvelle valeur (entiere)
+    double nouveauReel ;                                    // Nouvelle valeur (reelle)
+    string nouveauTexte ;                                   // Nouvelle valeur (chaine de caractere)
+    string jourAjout, moisAjout, anneeAjout ;               // Date d'ajout
+    string jourCreation, moisCreation, anneeCreation ;      // Date de creation
+    vector<int> erreur ;                                    // Vecteur des erreurs : 0-format, 1...8-champ
+    vector<int> erreurDate ;                                // Vecteur des erreurs liees a la saisie de la date
+
+    // Initialisation
+    erreur.clear() ;
+    erreurDate.clear() ;
+
+    switch (choix){
+        // Chemin d'acces
+        case 1 :
+            // Completer le chemin
+            nouveauTexte = "./DATA/Images/" + saisie ;    
+            // Si le chemin est invalide            
+            if(experimental::filesystem::exists(nouveauTexte) == false){
+                // Erreur : Chemin invalide
+                erreur.push_back(1) ;
+            // Sinon : Chemin d'acces est valide
+            }else{
+                // Modifier le chemin de l'image
+                setCheminAccesContenu(nouveauTexte) ;
+                biblio["images"][getNumeroJson()]["cheminAcces"] = nouveauTexte ; 
+            }
+            break ;
+
+        // Source
+        case 2 :
+            nouveauTexte = saisie ;
+            // Modifier la source de l'image
+            setSource(nouveauTexte) ;
+            biblio["images"][getNumeroJson()]["source"] = nouveauTexte ;    
+            break ;
+
+        // Titre
+        case 3 :
+            nouveauTexte = saisie ;
+            // Modifier le titre de l'image
+            setTitre(nouveauTexte) ;
+            biblio["images"][getNumeroJson()]["titre"] = nouveauTexte ;
+            break ;
+            
+        // Numero
+        case 4 :
+            // Si la saisie est un numero
+            if(VerifierNumero(saisie, nouveauEntier)){
+                // Si le numero existe deja dans la bibliotheque
+                if(VerifierNumero(nouveauEntier, biblio)){
+                    // Erreur : Numero existant
+                    erreur.push_back(4) ;
+                    erreur.push_back(1) ;
+                // Si le numero est negatif
+                }else if(nouveauEntier < 0){
+                    erreur.push_back(4) ;
+                    erreur.push_back(2) ;
+                // Sinon : numero valide
+                }else{
+                    // Modifier le numero de l'image
+                    setNumero(nouveauEntier) ;
+                    biblio["images"][getNumeroJson()]["numero"] = nouveauEntier ;
+                }
+            // Erreur de format
+            }else{
+                erreur.push_back(4) ;
+                erreur.push_back(0) ;
+            }
+            break ;
+
+        // Cout
+        case 5 :
+            // Verifier le format de la valeur saisie
+            if(VerifierNumero(saisie, nouveauReel)){
+                // Si le cout est negatif
+                if(nouveauReel < 0){
+                    // Erreur : Cout invalide
+                    erreur.push_back(5) ;
+                // Sinon : Cout est valide
+                }else{
+                    setCout(nouveauReel) ;
+                    biblio["images"][getNumeroJson()]["cout"] = nouveauReel ;
+                }
+            // Erreur de format
+            }else{
+                erreur.push_back(5) ;
+                erreur.push_back(0) ;
+            }
+            break ;
+
+        // Acces (Permission)
+        case 6 :
+            // Si la saisie est incorrecte
+            if((nouveauTexte != "P") && (nouveauTexte != "R")){
+                // Erreur : Acces invalide
+                erreur.push_back(6) ;
+            // Sinon : Acces est valide
+            }else{
                 // Modifier l'acces de l'image
                 setAcces(nouveauTexte) ;
                 biblio["images"][getNumeroJson()]["acces"] = nouveauTexte ;
-                break ;
+            }
+            break ;
 
+        // Date d'ajout
+        case 7 : 
+            // Verifier les erreurs de la sasiie de la date
+            erreurDate = VerifierDate(saisie, jourAjout, moisAjout, anneeAjout) ;
+            // S'il n'y a aucune erreur
+            if(erreurDate.empty()){
+                // Extraction de la date de creation pour comparer avec la date d'ajout
+                ExtraireDate(biblio["images"][getNumeroJson()]["dateAjout"].asString(), jourCreation, moisCreation, anneeCreation) ;
+                // Si la date d'ajout est inferieure a la date de creation
+                if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
+                    // Erreur : Date d'ajout est inferieure a la date de creation
+                    erreur.push_back(7) ;
+                // Sinon : Date d'ajout est valide
+                }else{
+                    // Modifer la date d'ajout de l'image
+                    setDateAjout(saisie) ;
+                    biblio["images"][getNumeroJson()]["dateAjout"] = saisie ;
+                }
+            // S'il y a des erreurs
+            }else{
+                erreur.push_back(7) ;
+                for(c = 0 ; c < (int)erreurDate.size() ; c++){
+                    erreur.push_back(erreurDate[c]) ;
+                }
+            }    
+            break ;
+
+        // Date de creation
+        case 8 :
+            // Verifier les erreurs de la sasiie de la date
+            erreurDate = VerifierDate(saisie, jourCreation, moisCreation, anneeCreation) ;
+            // S'il n'y a aucune erreur
+            if(erreurDate.empty()){
+                // Extraction de la date d'ajout pour comparer avec la date de creation
+                ExtraireDate(biblio["images"][getNumeroJson()]["dateAjout"].asString(), jourAjout, moisAjout, anneeAjout) ;
+                // Si la date de creation est superieure a la date de creation
+                if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
+                    // Erreur : Date de creation est superieure a la date de creation
+                    erreur.push_back(8) ;
+                // Sinon : Date de creation est valide
+                }else{
+                    // Modifer la date d'ajout de l'image
+                    setDateCreation(saisie) ;
+                    biblio["images"][getNumeroJson()]["dateCreation"] = saisie ;
+                }
+            // S'il y a des erreurs
+            }else{
+                erreur.push_back(8) ;
+                for(c = 0 ; c < (int)erreurDate.size() ; c++){
+                    erreur.push_back(erreurDate[c]) ;
+                }
+            }    
+            break ;
+
+        default :
+            break ;
+    }
+
+    // Retour
+    return erreur ;
+}			
+
+// Afficher les erreurs de la modification d'un descripteur de l'image
+void Image::ModifierDescripteurImage(const vector<int> erreur){
+    // Declaration de variable
+    int c ;             // Indice
+
+    // Affichage des erreurs
+    // S'il y a au moins une erreur
+    if((int)erreur.size() > 0){
+        switch(erreur[0]){
+            // Chemin d'acces
+            case 1 :
+                cout << "Ce chemin d'acces n'existe pas." << endl ;
+            // Source
+            case 2 :
+                break ;
+            // Titre
+            case 3 :
+                break ;
+            // Numero
+            case 4 :
+                switch (erreur[1]){
+                    case 0 :
+                        cout << "Le numero doit etre un entier." << endl ;
+                        break;
+                    case 1 :
+                        cout << "Cenumero est deja utilise dans la bibliotheque." << endl ;
+                        break ;
+                    case 2 :
+                        cout << "Le numero doit etre positif ou nul." << endl ;
+                        break ;
+                    default:
+                        break;
+                }
+                break ;
+            // Cout
+            case 5 :
+                if(((int)erreur.size() > 1) && (erreur[1] == 0)){
+                    cout << "Le cout doit eter un reel." << endl ;
+                }else{
+                    cout << "Le cout doit etre positif ou nul." << endl ;
+                }        
+                break ;
+            // Acces (Permission)
+            case 6 :
+                cout << "Acces doit etre 'P' ou 'R'." << endl ;
+                break ;
             // Date d'ajout
             case 7 :
-                // Saisir et valider la nouvelle date d'ajout
-                do{
-                    // Saisie
-                    cout << "Veuillez saisir la nouvelle date d'ajout (dd/mm/yyyy) : " ;
-                    nouveauTexte = SaisirDate(jourAjout, moisAjout, anneeAjout) ;
-
-                    // Extraction de la date de creation pour comparer avec la date d'ajout (dd/mm/yyyy)
-                    ExtraireDate(biblio["images"][getNumeroJson()]["dateCreation"].asString(), jourCreation, moisCreation, anneeCreation) ;
-
-                    // Verification
-                    if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
-                        cout << "La date d'ajout doit etre superieure ou egale a la date de creation. Veuillez reessayer." << endl ;
-                        validation = false ;
-                    }else{
-                        validation = true ;
-                    }                    
-                }while(validation == false) ;
-
-                // Modifer la date d'ajout de l'image
-                setDateAjout(nouveauTexte) ;
-                biblio["images"][getNumeroJson()]["dateAjout"] = nouveauTexte ;
+                if((int)erreur.size() == 1){
+                    cout << "La date d'ajout doit etre superieure ou egale a la date de creation." << endl ;
+                }else{
+                    for(c = 1 ; c < (int)erreur.size() ; c++){
+                        switch(erreur[c]){
+                            case 0 :
+                                cout << "Format invalide." << endl ;
+                                break ;
+                            case 1 :
+                                cout << "Annee dois etre entre 1800 et 2022." << endl ;
+                                break ;
+                            case 2 :
+                                cout << "Mois doit etre entre 1 et 12." << endl ;
+                                break ;
+                            case 3 :
+                                cout << "Jour doit etre entre 1 et 31." << endl ;
+                                break ;
+                            case 4 :
+                                cout << "Jour doit etre < 29." << endl ;
+                                break ;
+                            case 5 :
+                                cout << "Jour doit etre < 31." << endl ;
+                                break ;
+                            default :
+                                break ;
+                        }
+                    }                
+                }
                 break ;
-
             // Date de creation
             case 8 :
-                // Saisir et valider la nouvelle date de creation
-                do{
-                    validation = false ;
-                    // Saisie
-                    cout << "Veuillez saisir la nouvelle date de creation (dd/mm/yyyy) : " ;
-                    nouveauTexte = SaisirDate(jourCreation, moisCreation, anneeCreation) ;
-
-                    // Extraction de la date de creation pour comparer avec la date d'ajout (dd/mm/yyyy)
-                    ExtraireDate(biblio["images"][getNumeroJson()]["dateAjout"].asString(), jourAjout, moisAjout, anneeAjout) ;
-
-                    // Verification
-                    if((stoi(anneeAjout + moisAjout + jourAjout) - stoi(anneeCreation + moisCreation + jourCreation)) < 0){
-                        cout << "La date de creation doit etre inferieure ou egale a la date d'ajout. Veuillez reessayer." << endl ;
-                        validation = true ;
-                    }
-                }while(validation) ;
-
-                // Modifier la date de creation de l'image
-                setDateCreation(nouveauTexte) ;
-                biblio["images"][getNumeroJson()]["dateCreation"] = nouveauTexte ;
+                if((int)erreur.size() == 1){
+                    cout << "La date de creation doit etre inferieure ou egale a la date d'ajout." << endl ;
+                }else{
+                    for(c = 1 ; c < (int)erreur.size() ; c++){
+                        switch(erreur[c]){
+                            case 0 :
+                                cout << "Format invalide." << endl ;
+                                break ;
+                            case 1 :
+                                cout << "Annee dois etre entre 1800 et 2022." << endl ;
+                                break ;
+                            case 2 :
+                                cout << "Mois doit etre entre 1 et 12." << endl ;
+                                break ;
+                            case 3 :
+                                cout << "Jour doit etre entre 1 et 31." << endl ;
+                                break ;
+                            case 4 :
+                                cout << "Jour doit etre < 29." << endl ;
+                                break ;
+                            case 5 :
+                                cout << "Jour doit etre < 31." << endl ;
+                                break ;
+                            default :
+                                break ;
+                        }
+                    }                
+                }                
                 break ;
 
-            // Defaut
-            default : break ;
+            default :
+                break ;
         }
-    }while(Continuer("Voulez-vous modifier autre descripteur ? [Y/N] : ")) ;
-
-    // Sauvegarder
-    if(Continuer("Voulez-vous sauvegarder ce resultat ? [Y/N] : ")){
-        biblio_new.open(getCheminJson()) ;              // Ouvrir le fichier
-        biblio_new << styledWriter.write(biblio) ;      // Ecrire    
-        biblio_new.close() ;                            // Fermer le fichier
-        cout << "Modifications sauvegardees." << endl ;
-    }
-}
+    }   
+}									
 
 // Traitement de l'image
 void Image::TraitementImage(int choixTraitement){
@@ -601,13 +777,13 @@ void Image::TraitementImage(int choixTraitement){
         imageResultat = ImageRehaussementContour(image,20,2) ;
         titreFigure = "Image apres Rehaussement de contours (Laplacien)" ;
         break;
-        case 13 : /*
-        imageResultat = Seuillage(image) ;
-        titreFigure = "Image apres Seuillage" ;*/
+        case 13 : 
+        imageResultat = ImageSeuillage(image) ;
+        titreFigure = "Image apres Seuillage" ;
         break;
-        case 14 : /*
-        imageResultat = Segmentation(image) ;
-        titreFigure = "Image apres Segmentation" ;*/
+        case 14 : 
+        imageResultat = ImageSegmentation(image) ;
+        titreFigure = "Image apres Segmentation" ;
         break;
         case 15 : /*
         imageResultat = TransformHough(image) ;

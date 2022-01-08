@@ -27,15 +27,19 @@ Mat ImageContourLaplace(const Mat image) ;                              // Detec
 Mat ImageContour(const Mat image, const int choix) ;                    // Detection de contours 
 Mat ImageRehaussementContour(const Mat image, const int val, const int choix) ;                 // Rehaussement de contours
 
-// Segmentation
+// Seuillage
 Mat ImageSeuillage(const Mat image, const int seuil) ;                  // Seuillage d'une image en niveau gris
 Mat ImageSeuillage(const Mat image, vector<int> seuil) ;                // Seuillage d'une image en couleurs
 Mat ImageSeuillage(const Mat image, const int seuilBas, const int seuilHaut) ;                  // Seuillage par hysteresis d'une image en niveau gris
 Mat ImageSeuillage(const Mat image, vector<int> seuilBas, vector<int> seuilHaut) ;              // Seuillage par hysteresis d'une image en couleurs
+Mat ImageSeuillage(const Mat image) ;                                   // Seuillage - Menu
+
+// Segmentation
 Mat ImageSegmentation(const Mat image, const int seuil) ;                                       // Segmentation d'une image en niveau gris par seuillage simple
 Mat ImageSegmentation(const Mat image, vector<int> seuil) ;                                     // Segmentation d'une image en couleurs par seuillage simple
 Mat ImageSegmentation(const Mat image, const int seuilBas, const int seuilHaut) ;               // Segmentation d'une image en niveau gris par seuillage hysteresis
 Mat ImageSegmentation(const Mat image, vector<int> seuilBas, vector<int> seuilHaut) ;           // Segmentation d'une image en couleurs par seuillage hysteresis
+Mat ImageSegmentation(const Mat image) ;                                // Segmentation - Menu
 
 // Operations
 int MinImage(const Mat image) ;                                         // Determiner la valeur minimum dans une matrice entiere
@@ -61,3 +65,5 @@ Mat GenererFiltre(const int typeFiltre) ;					            // Generer les filtres
 Mat ConcatenerImageMono(Mat image1, Mat image2) ;                       // Concatener 2 images de memes dimensions en 1 image (en niveau gris)
 Mat ConcatenerImage(Mat image1, Mat image2) ;                           // Concatener 2 images de memes dimensions en 1 image (en couleurs)
 Mat MonoCouleur(const Mat image) ;                                      // Convertir le format d'une image monochrome en format RVB
+void SaisirSeuil(int& seuil) ;                                          // Saisie et verification de la valeur d'un seuil
+void SaisirSeuil(int& seuilBas, int& seuilHaut) ;                       // Saisie et verification des valeurs des seuils hysteresis
