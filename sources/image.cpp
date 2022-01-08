@@ -21,6 +21,7 @@ Image::Image()
         cin >> nbSaisi ;
         // Validation du format
         validation = VerifierNumero(nbSaisi, numero) ;
+        cout << "Here" << endl ;
         if(validation){
             // Validation du numero
             validation = VerifierNumero(numero, biblio) ;
@@ -186,18 +187,26 @@ Image::Image(string chemin, int numero){
 
 // Constructeur avec un objet bibliotheque et le numero de l'image connu 
 Image::Image(Bibliotheque objBiblio, int numImage){
+    // Declaration des variables
+    int c ;
     Json::Value biblioJson = objBiblio.getBilbiotheque();
-    _cheminAccesContenu = biblioJson["images"][numImage]["cheminAcces"].asString() ;
-    _source = biblioJson["images"][numImage]["source"].asString() ;
-    _titre = biblioJson["images"][numImage]["titre"].asString() ;
-    _numero = biblioJson["images"][numImage]["numero"].asInt() ;
-    _cout = biblioJson["images"][numImage]["cout"].asDouble() ;
-    _acces = biblioJson["images"][numImage]["acces"].asString() ;
-    _dateAjout = biblioJson["images"][numImage]["dateAjout"].asString() ;
-    _dateCreation = biblioJson["images"][numImage]["dateCreation"].asString() ;
-    _cheminJson = objBiblio.getCheminJson() ;
-    _numeroJson = numImage ;
-    //Image::AfficherDescripteurImage();
+
+    // Affectuer des attributs
+    for(c = 0 ; c < biblioJson["nbImages"].asInt() ; c++){
+        if(biblioJson["images"][c]["numero"].asInt() == numImage){
+            _cheminAccesContenu = biblioJson["images"][c]["cheminAcces"].asString() ;
+            _source = biblioJson["images"][c]["source"].asString() ;
+            _titre = biblioJson["images"][c]["titre"].asString() ;
+            _numero = biblioJson["images"][c]["numero"].asInt() ;
+            _cout = biblioJson["images"][c]["cout"].asDouble() ;
+            _acces = biblioJson["images"][c]["acces"].asString() ;
+            _dateAjout = biblioJson["images"][c]["dateAjout"].asString() ;
+            _dateCreation = biblioJson["images"][c]["dateCreation"].asString() ;
+            _cheminJson = objBiblio.getCheminJson() ; ;
+            _numeroJson = c ;
+            break ;
+        }
+    }
 }
 
 /*Getters*/

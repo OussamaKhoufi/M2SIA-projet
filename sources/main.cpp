@@ -12,7 +12,7 @@ void messagePasDroitAcces();
 
 int main (void){
 	lancerApp();
-    return 0 ;
+	return 0 ;
 }
 void entreePourContinuer(){
     cout << "Tapez sur une touche pour retourner au menu précedent...";
@@ -100,7 +100,7 @@ void menuTraitementImage(Bibliotheque objBiblio,int numImage){
 	}
 }
 void menuImage(Bibliotheque objBiblio,int numImage,bool droitAcces){
-	Image objImage(objBiblio,numImage-1);
+	Image objImage(objBiblio,numImage);
 	while(1){
 		int choix;
 		cout << endl << "---------------------------" << endl;
@@ -150,6 +150,7 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 	while(1){
 		int choix;
 		int numImage;
+		string saisie ;
 		//objBiblio.majBiblioSuivantDroitAcces(droitAcces);
 		cout << endl << "----------------------------------" << endl;
 		cout << endl << "---Menu Gestion de Bibliotheque---" << endl;
@@ -180,8 +181,18 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 			break;
 			case 5: 
             cout << "Veuillez donner le numéro de l'image : ";
-            cin >> numImage;
-			menuImage(objBiblio,numImage,droitAcces);
+			do{
+				cin >> saisie;
+				if(VerifierNumero(saisie, numImage)){
+					if(VerifierNumero(numImage, objBiblio.getBilbiotheque())){
+						menuImage(objBiblio,numImage,droitAcces);
+					}else{
+						cout << "Image n'existe pas dans la bibliotheque. Veuillez choisir un autre numero : " ;
+					}
+				}else{
+					cout << "Format invalide. Veuillez donner le numero de l'image : " ;
+				}
+			}while((VerifierNumero(saisie, numImage) == false) || (VerifierNumero(numImage, objBiblio.getBilbiotheque()) == false)) ;
 			break;
 			case 6:
             if (droitAcces){

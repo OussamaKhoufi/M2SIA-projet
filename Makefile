@@ -21,7 +21,7 @@ binaries = main.o image.o bibliotheque.o traitementImage.o complement.o exec_mai
 all: clean $(binaries)
 
 exec_main.exe : main.o image.o bibliotheque.o traitementImage.o complement.o
-	g++ -o exec_main.exe main.o bibliotheque.o image.o traitementImage.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
+	g++ -o exec_main.exe main.o bibliotheque.o image.o traitementImage.o complement.o -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio
 
 main.o : ./sources/main.cpp 
 	g++ -c ./sources/main.cpp -W -Wall -ljsoncpp -lstdc++fs -I/opencv2/include/ -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_videoio 
