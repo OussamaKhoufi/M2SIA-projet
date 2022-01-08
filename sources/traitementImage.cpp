@@ -346,7 +346,7 @@ Mat ImageRehaussementContour(const Mat image, const int val, const int choix){
     return imageRehaussement ;
 }
 
-//////////////////// Segmentation ////////////////////
+//////////////////// Seuillage ////////////////////
 
 // Seuillage d'une image en niveau gris
 Mat ImageSeuillage(const Mat image, const int seuil){
@@ -403,6 +403,106 @@ Mat ImageSeuillage(const Mat image, vector<int> seuilBas, vector<int> seuilHaut)
     return(ImageSeuillage(image, seuilBas) - ImageSeuillage(image, seuilHaut)) ;
 }   
 
+// Seuillage - Menu
+Mat ImageSeuillage(const Mat image){
+    // Declaration des variabes
+    bool validation ;                   // Verification des conditions pour la saisie
+    int choix ;                         // Choix du type de seuillage
+    int valTemp1, valTemp2 ;            // Valeur temporelle
+    string saisie ;                     // Valeur saisie par l'utilisateur
+    vector<int> seuilBas, seuilHaut ;   // Seuil bas, seuil haut
+    Mat imageSeuillage ;                // Image resultante
+
+    // Initialisation
+    saisie.clear() ;
+    seuilBas.clear() ;
+    seuilHaut.clear() ;
+
+    // Choisir le type de seuillage souhaite
+    cout << "Quel type de seuillage voulez-vous effectuer ?" << endl ;
+    cout << "1. Seuillage simple" << endl ;
+    cout << "2. Seuillage par hysteresis" << endl ;
+    // Saisie et verification
+    do{
+        validation = true ;
+        // Saisie du choix
+        cin >> saisie ;
+        // Si le format du choix est invalide
+        if(VerifierNumero(saisie, choix) == false){
+            cout << "Le choix doit etre un entier. Veuillez reessayer : " ;
+            validation = false ;
+        // Si le choix est invalide
+        }else if((choix != 1) && (choix != 2)){
+            cout << "Le choix doit etre '1' ou '2'. Veuillez reessayer : " ;
+            validation = false ;
+        }
+    }while(validation == false) ;
+
+    // Saisie des seuils
+    switch(choix){
+    // Seuillage simple
+        case 1 :
+            // Si l'image est en niveau de gris
+            if((int)image.channels() == 1){
+                cout << "Veuillez saisir la valeur du seuil : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+            // Si m'image est en couleurs
+            }else{
+                // Saisie du seuil de la composante bleue
+                cout << "Veuillez saisir la valeur du seuil de la composante bleue : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+                // Saisie du seuil de la composante verte
+                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+                // Saisie du seuil de la composante rouge
+                cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;    
+
+            }    
+            imageSeuillage = ImageSeuillage(image, seuilBas) ;                    
+            break ;
+        // Seuillage par hysteresis
+        case 2 :
+            // Si l'image est en niveau de gris
+            if((int)image.channels() == 1){
+                // Saisie et verification des seuils
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;
+            // Si m'image est en couleurs
+            }else{
+                // Seuils pour la composante bleue
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;                
+                // Seuils pour la composante verte
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;    
+                // Seuils pour la composante rouge
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;                    
+            }      
+            imageSeuillage = ImageSeuillage(image, seuilBas, seuilHaut) ;                             
+            break ;
+        default :
+            break ;
+    }
+
+    // Retour
+    return imageSeuillage ;
+}                                             
+
+//////////////////// Segmentation ////////////////////
+
 // Segmentation d'une image en niveau gris par seuillage simple
 Mat ImageSegmentation(const Mat image, const int seuil){
     // Declaration des variables
@@ -454,6 +554,104 @@ Mat ImageSegmentation(const Mat image, const int seuilBas, const int seuilHaut){
 Mat ImageSegmentation(const Mat image, vector<int> seuilBas, vector<int> seuilHaut){
     return (ImageSegmentation(image, seuilBas) - ImageSegmentation(image, seuilHaut)) ; 
 }          
+
+// Segmentation - Menu
+Mat ImageSegmentation(const Mat image){
+    // Declaration des variabes
+    bool validation ;                   // Verification des conditions pour la saisie
+    int choix ;                         // Choix du type de seuillage
+    int valTemp1, valTemp2 ;            // Valeur temporelle
+    string saisie ;                     // Valeur saisie par l'utilisateur
+    vector<int> seuilBas, seuilHaut ;   // Seuil bas, seuil haut
+    Mat imageSegmentation ;             // Image resultante
+
+    // Initialisation
+    seuilBas.clear() ;
+    seuilHaut.clear() ;
+
+    // Choisir le type de seuillage souhaite
+    cout << "Quel type de seuillage voulez-vous effectuer ?" << endl ;
+    cout << "1. Seuillage simple" << endl ;
+    cout << "2. Seuillage par hysteresis" << endl ;
+    // Saisie et verification
+    do{
+        validation = true ;
+        // Saisie du choix
+        saisie.clear() ;
+        cin >> saisie ;
+        // Si le format du choix est invalide
+        if(VerifierNumero(saisie, choix) == false){
+            cout << "Le choix doit etre un entier. Veuillez reessayer : " ;
+            validation = false ;
+        // Si le choix est invalide
+        }else if((choix != 1) && (choix != 2)){
+            cout << "Le choix doit etre '1' ou '2'. Veuillez reessayer : " ;
+            validation = false ;
+        }
+    }while(validation == false) ;
+
+    // Saisie des seuils
+    switch(choix){
+    // Seuillage simple
+        case 1 :
+            // Si l'image est en niveau de gris
+            if((int)image.channels() == 1){
+                cout << "Veuillez saisir la valeur du seuil : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+            // Si m'image est en couleurs
+            }else{
+                // Saisie du seuil de la composante bleue
+                cout << "Veuillez saisir la valeur du seuil de la composante bleue : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+                // Saisie du seuil de la composante verte
+                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;
+                // Saisie du seuil de la composante rouge
+                cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;    
+
+            }    
+            imageSegmentation = ImageSegmentation(image, seuilBas) ;                    
+            break ;
+        // Seuillage par hysteresis
+        case 2 :
+            // Si l'image est en niveau de gris
+            if((int)image.channels() == 1){
+                // Saisie et verification des seuils
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;
+            // Si m'image est en couleurs
+            }else{
+                // Seuils pour la composante bleue
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;                
+                // Seuils pour la composante verte
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;    
+                // Seuils pour la composante rouge
+                cout << "Seuils pour la composante rouge" << endl ;
+                SaisirSeuil(valTemp1, valTemp2) ;
+                seuilBas.push_back(valTemp1) ;
+                seuilHaut.push_back(valTemp2) ;                    
+            }      
+            imageSegmentation = ImageSegmentation(image, seuilBas, seuilHaut) ;                             
+            break ;
+        default :
+            break ;
+    }   
+
+    // Retour
+    return imageSegmentation ; 
+}                               
 
 //////////////////// Operations ////////////////////
 
@@ -961,7 +1159,7 @@ Mat ImageMiroir(const Mat image, const Mat filtre){
     return ImageMiroir ;
 }
 
-Mat ImageMiroir(const Mat image, const Mat filtre, int type = 6) ;	    // Effet miroir - Filtre donne
+// Mat ImageMiroir(const Mat image, const Mat filtre, int type = 6) ;	    // Effet miroir - Filtre donne
 
 
 Mat ImageMiroir(const Mat image, const int taille){
@@ -1233,3 +1431,50 @@ Mat MonoCouleur(const Mat image){
     // Retour
     return imageCouleur ;
 }
+
+ // Saisie et verification de la valeur d'un seuil
+void SaisirSeuil(int& seuil){
+    // Declaration des variables
+    bool validation ;           // Validation les conditions de la saisie du seuil
+    string saisie ;             // Valeur saisie par l'utilisateur
+
+    // Saisie et verification du seuil
+    do{
+        validation = true ;
+        // Saisie de la valeur du seuil
+        saisie.clear() ;
+        cin >> saisie ;
+        // Verifier le format de la valeur saisie
+        // Si le seuil saisi n'est pas un entier
+        if(VerifierNumero(saisie, seuil) == false){
+            cout << "Le seuil doit etre un entier. Veuillez reessayer : " ;
+            validation = false ;
+        // Si le seuil n'est pas dans [0,255]
+        }else if((seuil < 0) || (seuil > 255)){
+            cout << "Le seuil doit etre entre entre 0 et 255. Veuillez reessayer : " ;
+            validation = false ;
+        // Sinon : seuil valide
+        }
+    }while(validation == false) ;    
+}                                               
+
+// Saisie et verification des valeurs des seuils hysteresis
+void SaisirSeuil(int& seuilBas, int& seuilHaut){
+    // Saisie du seuil bas
+    cout << "Veuillez saisir le seuil bas : " ;
+    SaisirSeuil(seuilBas) ;
+    // Saisie du seuil haut
+    cout << "Veuillez saisir le seuil haut : " ;
+    do{
+        SaisirSeuil(seuilHaut) ;
+        if(seuilHaut < seuilBas){
+            cout << "La valeur du seuil haut doit etre superieure ou egale a la valeur du seuil bas. Veuillez reessayer : " ;
+        }
+    }while(seuilHaut < seuilBas) ;    
+}                     
+
+
+
+
+
+
