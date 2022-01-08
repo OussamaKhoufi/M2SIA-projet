@@ -317,7 +317,8 @@ void Image::ModifierDescripteurImage(){
     bool validation ;                                                               // Variable booleenne pour valider les conditions
     int choix ;                                                                     // Choix des actions  
     int nouveauEntier ;                                                             // Variable pour la saisie des numeros entiers
-    double nouveauReel ;                                                            // Variable pour la saisie des numeros reels      
+    double nouveauReel ;                                                            // Variable pour la saisie des numeros reels  
+    string saisie ;    
     string nouveauTexte ;                                                           // Variable pour la saisie des chaines de caractere
     string jourAjout, moisAjout, anneeAjout ;                                       // Jour, Mois, Annee d'ajout
     string jourCreation, moisCreation, anneeCreation ;                              // Jour, Mois, Annee de creation
@@ -676,6 +677,10 @@ vector<int> Image::ModifierDescripteurImage(const int choix, const string saisie
 
 // Afficher les erreurs de la modification d'un descripteur de l'image
 void ModifierDescripteurImage(const vector<int> erreur){
+    // Declaration de variable
+    int c ;             // Indice
+
+    // Affichage des erreurs
     switch(erreur[0]){
         // Chemin d'acces
         case 1 :
@@ -716,12 +721,63 @@ void ModifierDescripteurImage(const vector<int> erreur){
             if((int)erreur.size() == 1){
                 cout << "La date d'ajout doit etre superieure ou egale a la date de creation." << endl ;
             }else{
-                
+                for(c = 1 ; c < (int)erreur.size() ; c++){
+                    switch(erreur[c]){
+                        case 0 :
+                            cout << "Format invalide." << endl ;
+                            break ;
+                        case 1 :
+                            cout << "Annee dois etre entre 1800 et 2022." << endl ;
+                            break ;
+                        case 2 :
+                            cout << "Mois doit etre entre 1 et 12." << endl ;
+                            break ;
+                        case 3 :
+                            cout << "Jour doit etre entre 1 et 31." << endl ;
+                            break ;
+                        case 4 :
+                            cout << "Jour doit etre < 29." << endl ;
+                            break ;
+                        case 5 :
+                            cout << "Jour doit etre < 31." << endl ;
+                            break ;
+                        default :
+                            break ;
+                    }
+                }                
             }
             break ;
 
         // Date de creation
         case 8 :
+            if((int)erreur.size() == 1){
+                cout << "La date de creation doit etre inferieure ou egale a la date d'ajout." << endl ;
+            }else{
+                for(c = 1 ; c < (int)erreur.size() ; c++){
+                    switch(erreur[c]){
+                        case 0 :
+                            cout << "Format invalide." << endl ;
+                            break ;
+                        case 1 :
+                            cout << "Annee dois etre entre 1800 et 2022." << endl ;
+                            break ;
+                        case 2 :
+                            cout << "Mois doit etre entre 1 et 12." << endl ;
+                            break ;
+                        case 3 :
+                            cout << "Jour doit etre entre 1 et 31." << endl ;
+                            break ;
+                        case 4 :
+                            cout << "Jour doit etre < 29." << endl ;
+                            break ;
+                        case 5 :
+                            cout << "Jour doit etre < 31." << endl ;
+                            break ;
+                        default :
+                            break ;
+                    }
+                }                
+            }                
             break ;
 
         default :
