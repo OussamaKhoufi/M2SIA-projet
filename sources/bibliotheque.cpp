@@ -1,6 +1,6 @@
 #include "../headers/bibliotheque.h"
 
-/*COnstructeurs*/
+/*Constructeurs*/
 // Constructeur vide
 Bibliotheque::Bibliotheque(){
     // Declaration des variables
@@ -56,18 +56,24 @@ Bibliotheque::Bibliotheque(const Json::Value bibliotheque){
     setBilbiotheque(bibliotheque) ;
 }
 
-// Getters
+/*Getters*/
+// Bibliotheque
 Json::Value Bibliotheque::getBilbiotheque() const{
     return _bibliotheque ;
 }
+
+// Chemin Json
 string Bibliotheque::getCheminJson() const {
     return _cheminJson; 
 }
 
-// Setters
+/*Setters*/
+// Bibliohteque
 void Bibliotheque::setBilbiotheque(const Json::Value bibliotheque){
     _bibliotheque = bibliotheque ;
 }
+
+// Chemin Json
 void Bibliotheque::setCheminJson(const string cheminJson){
     _cheminJson = cheminJson ;
 }
@@ -96,6 +102,7 @@ void Bibliotheque::AfficherDescripteurs(){
 
 // Afficher la liste des descripteurs d'une partie indiquee de la bibliotheque
 void Bibliotheque::AfficherDescripteurs(const Json::Value bibliotheque, const int indice){
+    cout << "Chemin d'acces : " << bibliotheque["images"][indice]["cheminAcces"].asString() << endl ;
     cout << "Source : " << bibliotheque["images"][indice]["source"].asString() << endl ;
     cout << "Titre : " << bibliotheque["images"][indice]["titre"].asString() << endl ;
     cout << "Numero : " << bibliotheque["images"][indice]["numero"].asInt() << endl ;

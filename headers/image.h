@@ -76,8 +76,10 @@ class Image{
         /*Methodes*/
         void AfficherContenuImage() ;														// Afficher le contenu de l'image
         void AfficherDescripteurImage() ;													// Afficher les descripteurs de l'image
-        void ModifierDescripteurImage() ;													// Modifier un descripteur de l'image
-        void TraitementImage(int choixTraitement) ;											// Traitement de l'image
+        void ModifierDescripteurImage() ;													// Modifier un descripteur de l'image (saisie & affichage)
+		vector<int> ModifierDescripteurImage(const int choix, const string saisie, Json::Value& biblio) ;		// Modifier un descripteur de l'image (verification et affectation)
+        void ModifierDescripteurImage(const vector<int> erreur) ;							// Afficher les erreurs de la modification d'un descripteur de l'image
+		void TraitementImage(int choixTraitement) ;											// Traitement de l'image
 } ;
 
 #endif // IMAGE_H

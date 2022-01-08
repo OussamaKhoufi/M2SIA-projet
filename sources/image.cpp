@@ -311,7 +311,7 @@ void Image::AfficherDescripteurImage(){
     cout << "Date de creation :" << getDateCreation() << endl ;
 }
 
-// Modifier les descripteurs de l'image
+// Modifier les descripteurs de l'image (saisie & affichage)
 void Image::ModifierDescripteurImage(){
     // Declaration des variables
     bool validation ;                                                               // Variable booleenne pour valider les conditions
@@ -499,14 +499,235 @@ void Image::ModifierDescripteurImage(){
         }
     }while(Continuer("Voulez-vous modifier autre descripteur ? [Y/N] : ")) ;
 
-    // Sauvegarder
+    /*// Sauvegarder
     if(Continuer("Voulez-vous sauvegarder ce resultat ? [Y/N] : ")){
         biblio_new.open(getCheminJson()) ;              // Ouvrir le fichier
         biblio_new << styledWriter.write(biblio) ;      // Ecrire    
         biblio_new.close() ;                            // Fermer le fichier
         cout << "Modifications sauvegardees." << endl ;
-    }
+    }*/
 }
+
+// Modifier un descripteur de l'image (verification et affectation)
+vector<int> Image::ModifierDescripteurImage(const int choix, const string saisie, Json::Value& biblio){
+    // Declaration des variables
+    int c ;                                                 // Indice
+    int nouveauEntier ;                                     // Nouvelle valeur (entiere)
+    double nouveauReel ;                                    // Nouvelle valeur (reelle)
+    string nouveauTexte ;                                   // Nouvelle valeur (chaine de caractere)
+    string jourAjout, moisAjout, anneeAjout ;               // Date d'ajout
+    string jourCreation, moisCreation, anneeCreation ;      // Date de creation
+    vector<int> erreur ;                                    // Vecteur des erreurs : 0-format, 1...8-champ
+    vector<int> erreurDate ;                                // Vecteur des erreurs liees a la saisie de la date
+
+    // Initialisation
+    erreur.clear() ;
+    erreurDate.clear() ;
+
+    switch (choix){
+        // Chemin d'acces
+        case 1 :
+            // Completer le chemin
+            nouveauTexte = "./DATA/Images/" + saisie ;    
+            // Si le chemin est invalide            
+            if(experimental::filesystem::exists(nouveauTexte) == false){
+                // Erreur : Chemin invalide
+                erreur.push_back(1) ;
+            // Sinon : Chemin d'acces est valide
+            }else{
+                // Modifier le chemin de l'image
+                setCheminAccesContenu(nouveauTexte) ;
+                biblio["images"][getNumeroJson()]["cheminAcces"] = nouveauTexte ; 
+            }
+            break ;
+
+        // Source
+        case 2 :
+            nouveauTexte = saisie ;
+            // Modifier la source de l'image
+            setSource(nouveauTexte) ;
+            biblio["images"][getNumeroJson()]["source"] = nouveauTexte ;    
+            break ;
+
+        // Titre
+        case 3 :
+            nouveauTexte = saisie ;
+            // Modifier le titre de l'image
+            setTitre(nouveauTexte) ;
+            biblio["images"][getNumeroJson()]["titre"] = nouveauTexte ;
+            break ;
+            
+        // Numero
+        case 4 :
+            // Si la saisie est un numero
+            if(VerifierNumero(saisie, nouveauEntier)){
+                // Si le numero existe deja dans la bibliotheque
+                if(VerifierNumero(nouveauEntier, biblio)){
+                    // Erreur : Numero existant
+                    erreur.push_back(4) ;
+                // Sinon : Numero est valide
+                }else{
+                    // Modifier le numero de l'image
+                    setNumero(nouveauEntier) ;
+                    biblio["images"][getNumeroJson()]["numero"] = nouveauEntier ;
+                }
+            // Erreur de format
+            }else{
+                erreur.push_back(4) ;
+                erreur.push_back(0) ;
+            }
+            break ;
+
+        // Cout
+        case 5 :
+            // Verifier le format de la valeur saisie
+            if(VerifierNumero(saisie, nouveauReel)){
+                // Si le cout est negatif
+                if(nouveauReel < 0){
+                    // Erreur : Cout invalide
+                    erreur.push_back(5) ;
+                // Sinon : Cout est valide
+                }else{
+                    setCout(nouveauReel) ;
+                    biblio["images"][getNumeroJson()]["cout"] = nouveauReel ;
+                }
+            // Erreur de format
+            }else{
+                erreur.push_back(5) ;
+                erreur.push_back(0) ;
+            }
+            break ;
+
+        // Acces (Permission)
+        case 6 :
+            // Si la saisie est incorrecte
+            if((nouveauTexte != "P") && (nouveauTexte != "R")){
+                // Erreur : Acces invalide
+                erreur.push_back(6) ;
+            // Sinon : Acces est valide
+            }else{
+                // Modifier l'acces de l'image
+                setAcces(nouveauTexte) ;
+                biblio["images"][getNumeroJson()]["acces"] = nouveauTexte ;
+            }
+            break ;
+
+        // Date d'ajout
+        case 7 : 
+            // Verifier les erreurs de la sasiie de la date
+            erreurDate = VerifierDate(saisie, jourAjout, moisAjout, anneeAjout) ;
+            // S'il n'y a aucune erreur
+            if(erreurDate.empty()){
+                // Extraction de la date de creation pour comparer avec la date d'ajout
+                ExtraireDate(biblio["images"][getNumeroJson()]["dateAjout"].asString(), jourCreation, moisCreation, anneeCreation) ;
+                // Si la date d'ajout est inferieure a la date de creation
+                if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
+                    // Erreur : Date d'ajout est inferieure a la date de creation
+                    erreur.push_back(7) ;
+                // Sinon : Date d'ajout est valide
+                }else{
+                    // Modifer la date d'ajout de l'image
+                    setDateAjout(saisie) ;
+                    biblio["images"][getNumeroJson()]["dateAjout"] = saisie ;
+                }
+            // S'il y a des erreurs
+            }else{
+                erreur.push_back(7) ;
+                for(c = 0 ; c < (int)erreurDate.size() ; c++){
+                    erreur.push_back(erreurDate[c]) ;
+                }
+            }    
+            break ;
+
+        // Date de creation
+        case 8 :
+            // Verifier les erreurs de la sasiie de la date
+            erreurDate = VerifierDate(saisie, jourCreation, moisCreation, anneeCreation) ;
+            // S'il n'y a aucune erreur
+            if(erreurDate.empty()){
+                // Extraction de la date d'ajout pour comparer avec la date de creation
+                ExtraireDate(biblio["images"][getNumeroJson()]["dateAjout"].asString(), jourAjout, moisAjout, anneeAjout) ;
+                // Si la date de creation est superieure a la date de creation
+                if((stoi(anneeAjout + moisAjout + anneeAjout))- (stoi(anneeCreation + moisCreation + jourCreation)) < 0){
+                    // Erreur : Date de creation est superieure a la date de creation
+                    erreur.push_back(8) ;
+                // Sinon : Date de creation est valide
+                }else{
+                    // Modifer la date d'ajout de l'image
+                    setDateCreation(saisie) ;
+                    biblio["images"][getNumeroJson()]["dateCreation"] = saisie ;
+                }
+            // S'il y a des erreurs
+            }else{
+                erreur.push_back(8) ;
+                for(c = 0 ; c < (int)erreurDate.size() ; c++){
+                    erreur.push_back(erreurDate[c]) ;
+                }
+            }    
+            break ;
+
+        default :
+            break ;
+    }
+
+    // Retour
+    return erreur ;
+}			
+
+// Afficher les erreurs de la modification d'un descripteur de l'image
+void ModifierDescripteurImage(const vector<int> erreur){
+    switch(erreur[0]){
+        // Chemin d'acces
+        case 1 :
+            cout << "Ce chemin d'acces n'existe pas." << endl ;
+        
+        // Source
+        case 2 :
+            break ;
+        // Titre
+        case 3 :
+            break ;
+
+        // Numero
+        case 4 :
+            if(((int)erreur.size() > 1) && (erreur[1] == 0)){
+                cout << "Le numero doit eter un entier." << endl ;
+            }else{
+                cout << "Ce numero est deja utilise." << endl ;
+            }
+            break ;
+
+        // Cout
+        case 5 :
+            if(((int)erreur.size() > 1) && (erreur[1] == 0)){
+                cout << "Le cout doit eter un reel." << endl ;
+            }else{
+                cout << "Le cout doit etre positif ou nul." << endl ;
+            }        
+            break ;
+
+        // Acces (Permission)
+        case 6 :
+            cout << "Acces doit etre 'P' ou 'R'." << endl ;
+            break ;
+
+        // Date d'ajout
+        case 7 :
+            if((int)erreur.size() == 1){
+                cout << "La date d'ajout doit etre superieure ou egale a la date de creation." << endl ;
+            }else{
+                
+            }
+            break ;
+
+        // Date de creation
+        case 8 :
+            break ;
+
+        default :
+            break ;
+    }
+}									
 
 // Traitement de l'image
 void Image::TraitementImage(int choixTraitement){

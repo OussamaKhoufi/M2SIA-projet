@@ -24,9 +24,9 @@ int main (void){
 	string chemin = "bibliotheque.json" ;
 	Bibliotheque A(chemin) ;
 	Json::Value B ;
-	B = A.Trier(5) ;
+	A.Trier() ;
 
-	cout << B << endl ;
+	//cout << B << endl ;
 
 /*
 	Image B("./DATA/Bibliothèques/test.json", 1) ;
