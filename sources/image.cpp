@@ -695,8 +695,7 @@ void Image::ModifierDescripteurImage(const vector<int> erreur){
 
 // Traitement de l'image
 void Image::TraitementImage(int choixTraitement){
-    Mat image = imread(getCheminAccesContenu()) ;                                   // Charger l'image
-    Mat image_channels[3] ;                                                         // Canaux de l'image
+    Mat image = imread(getCheminAccesContenu(),IMREAD_COLOR) ;                                   // Charger l'image
     Mat imageResultat;
     string titreFigure;
     string stringSaisi; 

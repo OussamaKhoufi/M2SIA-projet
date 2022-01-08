@@ -22,7 +22,7 @@
       },
       {
          "acces" : "P",
-         "cheminAcces" : "./DATA/Images/lena.pgm",
+         "cheminAcces" : "./DATA/Images/lena.png",
          "cout" : 69,
          "dateAjout" : "10/01/2021",
          "dateCreation" : "23/06/1980",

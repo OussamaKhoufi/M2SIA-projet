@@ -442,10 +442,10 @@ Mat ImageSeuillage(const Mat image){
     // Seuillage simple
         case 1 :
             // Si l'image est en niveau de gris
-            if((int)image.channels() == 1){
+            if((int)image.depth() == 0){
                 cout << "Veuillez saisir la valeur du seuil : " ;
                 SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;
+                imageSeuillage = ImageSeuillage(image, valTemp1) ; 
             // Si m'image est en couleurs
             }else{
                 // Saisie du seuil de la composante bleue
@@ -459,19 +459,19 @@ Mat ImageSeuillage(const Mat image){
                 // Saisie du seuil de la composante rouge
                 cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
                 SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;    
+                seuilBas.push_back(valTemp1) ;
+                imageSeuillage = ImageSeuillage(image, seuilBas) ;     
 
             }    
-            imageSeuillage = ImageSeuillage(image, seuilBas) ;                    
+                               
             break ;
         // Seuillage par hysteresis
         case 2 :
             // Si l'image est en niveau de gris
-            if((int)image.channels() == 1){
+            if((int)image.depth() == 0){
                 // Saisie et verification des seuils
                 SaisirSeuil(valTemp1, valTemp2) ;
-                seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ;
+                imageSeuillage = ImageSeuillage(image, valTemp1, valTemp2) ;
             // Si m'image est en couleurs
             }else{
                 // Seuils pour la composante bleue
@@ -488,9 +488,10 @@ Mat ImageSeuillage(const Mat image){
                 cout << "Seuils pour la composante rouge" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ;                    
+                seuilHaut.push_back(valTemp2) ; 
+                imageSeuillage = ImageSeuillage(image, seuilBas, seuilHaut) ;                   
             }      
-            imageSeuillage = ImageSeuillage(image, seuilBas, seuilHaut) ;                             
+                                         
             break ;
         default :
             break ;
@@ -594,10 +595,10 @@ Mat ImageSegmentation(const Mat image){
     // Seuillage simple
         case 1 :
             // Si l'image est en niveau de gris
-            if((int)image.channels() == 1){
+            if((int)image.depth() == 0){
                 cout << "Veuillez saisir la valeur du seuil : " ;
                 SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;
+                imageSegmentation = ImageSegmentation(image, valTemp1) ;
             // Si m'image est en couleurs
             }else{
                 // Saisie du seuil de la composante bleue
@@ -611,19 +612,19 @@ Mat ImageSegmentation(const Mat image){
                 // Saisie du seuil de la composante rouge
                 cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
                 SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;    
+                seuilBas.push_back(valTemp1) ;
+                imageSegmentation = ImageSegmentation(image, seuilBas) ;    
 
             }    
-            imageSegmentation = ImageSegmentation(image, seuilBas) ;                    
+                                
             break ;
         // Seuillage par hysteresis
         case 2 :
             // Si l'image est en niveau de gris
-            if((int)image.channels() == 1){
+            if((int)image.depth() == 0){
                 // Saisie et verification des seuils
                 SaisirSeuil(valTemp1, valTemp2) ;
-                seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ;
+                imageSegmentation = ImageSegmentation(image, valTemp1, valTemp2) ; 
             // Si m'image est en couleurs
             }else{
                 // Seuils pour la composante bleue
@@ -640,9 +641,10 @@ Mat ImageSegmentation(const Mat image){
                 cout << "Seuils pour la composante rouge" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ;                    
+                seuilHaut.push_back(valTemp2) ; 
+                imageSegmentation = ImageSegmentation(image, seuilBas, seuilHaut) ;                    
             }      
-            imageSegmentation = ImageSegmentation(image, seuilBas, seuilHaut) ;                             
+                                        
             break ;
         default :
             break ;
