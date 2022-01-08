@@ -249,7 +249,7 @@ Mat ImageMedian(const Mat image){
 }
 
 // Debruitage
-Mat ImageDebruitage(const Mat image, const int choix){
+Mat ImageFiltrage(const Mat image, const int choix){
     switch(choix){
         // Filtre moyenneur
         case 1 :
@@ -284,8 +284,8 @@ Mat ImageContourGradient(const Mat image){
     }
 
     // Calculer des gradients
-	gradientX = GradientX(imageContour, "Sobel") ;          // En x
-    gradientY = GradientY(imageContour, "Sobel") ;          // En y
+	gradientX = GradientX(imageContour, "Simple") ;          // En x
+    gradientY = GradientY(imageContour, "Simple") ;          // En y
 
     // Norme du gradient
     imageContour = MatriceNorme(gradientX, gradientY) ;
@@ -293,14 +293,13 @@ Mat ImageContourGradient(const Mat image){
 
     // Maximum de la norme du gradient dans la direction du gradient
     //imageContour = MaxNormeGradient(ImageSeuillage(MatriceNorme(gradientX, gradientY), 250), gradientX, gradientY) ;
-
     // Retour
     return imageContour ;
 }
 
 // Detection de contours par filtre laplacien
 Mat ImageContourLaplace(const Mat image){
-   	return ImageSeuillage(ImageConvolution(ImageMonochrome(image), GenererFiltre(2)), 250) ;
+   	return ImageSeuillage(ImageConvolution(ImageMonochrome(image), GenererFiltre(2)),200,250) ;
 }
 
 // Detection de contours
@@ -683,9 +682,9 @@ Mat MatriceNorme(const Mat imageX, const Mat imageY){
     // Calculer la norme de chaque pixel
     for(ligne = 0 ; ligne < imageX.size().height ; ligne++){
         for(colonne = 0 ; colonne < imageX.size().width ; colonne++){
-            x2 = imageX.at<unsigned char>(ligne, colonne)*imageX.at<unsigned char>(ligne, colonne) ;
-            y2 = imageY.at<unsigned char>(ligne, colonne)*imageY.at<unsigned char>(ligne, colonne) ;
-            imageNorme.at<unsigned char>(ligne, colonne) = sqrt(x2 + y2) ;
+            x2 = (double)imageX.at<unsigned char>(ligne, colonne)*imageX.at<unsigned char>(ligne, colonne) ;
+            y2 = (double)imageY.at<unsigned char>(ligne, colonne)*imageY.at<unsigned char>(ligne, colonne) ;
+            imageNorme.at<unsigned char>(ligne, colonne) = (int)sqrt(x2 + y2) ;
         }
     }
 
@@ -960,9 +959,6 @@ Mat ImageMiroir(const Mat image, const Mat filtre){
 
     return ImageMiroir ;
 }
-
-Mat ImageMiroir(const Mat image, const Mat filtre, int type = 6) ;	    // Effet miroir - Filtre donne
-
 
 Mat ImageMiroir(const Mat image, const int taille){
     // Declaration des variables

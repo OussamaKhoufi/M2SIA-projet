@@ -16,10 +16,10 @@ Mat ImageEgalisationMono(const Mat image) ;                             // Egali
 Mat ImageEgalisation(const Mat image) ;                                 // Egalisation d'une image en couleurs
 Mat ImageRehaussementContraste(const Mat image, const int choix) ;      // Rehaussement de contraste
 
-// Debruitage
-Mat ImageMedianMono(const Mat image) ;                                  // Debruitage par filtre median pour une image en niveau gris
-Mat ImageMedian(const Mat image) ;                                      // Debruitage par filtre median pour une image en couleurs
-Mat ImageDebruitage(const Mat image, const int choix) ;                 // Debruitage
+// Filtrage
+Mat ImageMedianMono(const Mat image) ;                                  // Filtrage par filtre median pour une image en niveau gris
+Mat ImageMedian(const Mat image) ;                                      // Filtrage par filtre median pour une image en couleurs
+Mat ImageFiltrage(const Mat image, const int choix) ;                 // Filtrage
 
 // Contours
 Mat ImageContourGradient(const Mat image) ;                             // Detection de contours par filtres gradients

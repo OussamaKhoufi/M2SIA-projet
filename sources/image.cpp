@@ -522,39 +522,104 @@ void Image::TraitementImage(int choixTraitement){
     Mat image = imread(getCheminAccesContenu()) ;                                   // Charger l'image
     Mat image_channels[3] ;                                                         // Canaux de l'image
     Mat imageResultat;
-    string titreFigure; 
+    string titreFigure;
+    string stringSaisi; 
+    bool traitementFini;
     
     switch (choixTraitement){
         case 1 :
         imageResultat = ImageMonochrome(image) ;
-        titreFigure="Image en Niveau de Gris";
+        titreFigure = "Image en Niveau de Gris";
         break;
-        case 2 : 
-        imageResultat = ImageConvolution(image, GenererFiltre(1)) ;
-        titreFigure="Filtrage avec Moyenneur";
+        case 2 :
+        imageResultat = ImageInversement(image) ;
+        titreFigure="Image en Négatif";
         break;
-        case 3 : 
-        imageResultat = ImageConvolution(image, GenererFiltre(2)) ;
-        titreFigure="Filtrage avec Laplacien";
+        case 3 :
+        int choix;        
+        cout << endl << "Pour choisir une composante à afficher tapez : " << endl;
+        cout << endl << "1 pour la composante Rouge." << endl;
+        cout << endl << "2 pour la composante Verte." << endl;
+        cout << endl << "3 pour la composante Bleue." << endl;
+        do {
+            traitementFini= true;
+            cout << endl << "Votre choix :";
+            cin >> stringSaisi;
+            if (VerifierNumero(stringSaisi,choix)){
+                if (choix==1){
+                    imageResultat = ImageExtractionCouleur(image,1) ;
+                    titreFigure = "Composante Rouge de l'Image en Couleur" ;
+                }else if(choix==2){
+                    imageResultat = ImageExtractionCouleur(image,2) ;
+                    titreFigure = "Composante Verte de l'Image en Couleur" ;
+                }else if(choix==3){
+                    imageResultat = ImageExtractionCouleur(image,3) ;
+                    titreFigure = "Composante Bleue de l'Image en Couleur" ;
+                }else {
+                    cout << endl <<"Choix non valide : il faut choisir 1,2 ou 3 !" << endl ;
+                    traitementFini= false;
+                }
+            }else{
+                cout << endl <<"Choix non valide : il faut un des entiers {1,2,3}" << endl ;
+                traitementFini= false;
+            }
+        }while(traitementFini==false);        
         break;
         case 4 : 
-        imageResultat = ImageConvolution(image, GenererFiltre(3)) ;
-        titreFigure="Filtrage avec Gaussien";
+        imageResultat = ImageRehaussementContraste(ImageMonochrome(image),1) ;
+        titreFigure = "Image apres Normalisation" ;
         break;
         case 5 : 
-        imageResultat = ImageConvolution(image, GenererFiltre(4)) ;
-        titreFigure="Filtrage avec Gradient en x (Sobel)";
+        imageResultat = ImageRehaussementContraste(ImageMonochrome(image),2) ;
+        titreFigure = "Image apres Egalisation" ;
         break;
         case 6 : 
-        imageResultat = ImageConvolution(image, GenererFiltre(5)) ;
-        titreFigure="Filtrage avec Gradient en y (Sobel)";
+        imageResultat = ImageFiltrage(ImageMonochrome(image),1) ;
+        titreFigure = "Image Filtree avec Filtre Moyenneur 3x3" ;
+        break;
+        case 7 : 
+        imageResultat = ImageFiltrage(ImageMonochrome(image),2) ;
+        titreFigure = "Image Filtree avec Filtre Gaussien 3x3" ;
+        break;
+        case 8 : 
+        imageResultat = ImageFiltrage(ImageMonochrome(image),3) ;
+        titreFigure = "Image Filtree avec Filtre Median 3x3" ;
+        break;
+        case 9 : 
+        imageResultat = ImageContour(image,1) ;
+        titreFigure = "Image de Contours avec Filtre Sobel 3x3" ;
+        break;
+        case 10 : 
+        imageResultat = ImageContour(image,2) ;
+        titreFigure = "Image de Contours avec Filtre Laplacien 3x3" ;
+        break;
+        case 11 : 
+        imageResultat = ImageRehaussementContour(image,20,1) ;
+        titreFigure = "Image apres Rehaussement de Contours (Gradient)" ;
+        break;
+        case 12 : 
+        imageResultat = ImageRehaussementContour(image,20,2) ;
+        titreFigure = "Image apres Rehaussement de contours (Laplacien)" ;
+        break;
+        case 13 : /*
+        imageResultat = Seuillage(image) ;
+        titreFigure = "Image apres Seuillage" ;*/
+        break;
+        case 14 : /*
+        imageResultat = Segmentation(image) ;
+        titreFigure = "Image apres Segmentation" ;*/
+        break;
+        case 15 : /*
+        imageResultat = TransformHough(image) ;
+        titreFigure = "Image apres Rehaussement de contours (Laplacien)" ;*/
         break;
         default :
-        cout << "Error Choix Traitement d'image!";
+        cout << "Erreur choix Traitement d'images";
         break; 
     }
     
     // Affichage
+    imageResultat=ConcatenerImage(image,imageResultat);
     namedWindow(titreFigure) ; 
     imshow(titreFigure, imageResultat);  
     waitKey(0) ; 

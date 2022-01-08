@@ -19,7 +19,47 @@
          "numero" : 2,
          "source" : "Nasa",
          "titre" : "halloween sun"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/lena.pgm",
+         "cout" : 69,
+         "dateAjout" : "10/01/2021",
+         "dateCreation" : "23/06/1980",
+         "numero" : 3,
+         "source" : "matlab",
+         "titre" : "lena"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/echec.jpg",
+         "cout" : 88,
+         "dateAjout" : "15/02/2021",
+         "dateCreation" : "12/03/1988",
+         "numero" : 4,
+         "source" : "google",
+         "titre" : "chess"
+      },
+      {
+         "acces" : "R",
+         "cheminAcces" : "./DATA/Images/guass.jpg",
+         "cout" : 23,
+         "dateAjout" : "12/03/1998",
+         "dateCreation" : "23/02/1996",
+         "numero" : 5,
+         "source" : "rome",
+         "titre" : "visage"
+      },
+      {
+         "acces" : "R",
+         "cheminAcces" : "./DATA/Images/saltpepper.png",
+         "cout" : 78,
+         "dateAjout" : "21/04/2020",
+         "dateCreation" : "23/01/1985",
+         "numero" : 6,
+         "source" : "google",
+         "titre" : "salt"
       }
    ],
-   "nbImages" : 2
+   "nbImages" : 6
 }
