@@ -5,7 +5,7 @@ using namespace std ;
 
 //////////////////// Traitement de couleur ////////////////////
 
-// Convertir une image en niveau gris
+// Convertir une image en niveau de gris
 Mat ImageMonochrome(const Mat image){
     // Declaration des variables
     int c ;                                     // Indice
@@ -36,7 +36,7 @@ Mat ImageMonochrome(const Mat image){
     return imageGris ;
 }
 
-// Inverser une image en niveau gris
+// Inverser une image en niveau de gris
 Mat ImageInversementMono(const Mat image){
     // Declaration des variables
     int ligne, colonne ;
@@ -137,7 +137,7 @@ Mat Normalisation(const Mat image){
     return imageNormalisation ;
 }
 
-// Egalisation d'une image en niveau gris
+// Egalisation d'une image en niveau de gris
 Mat ImageEgalisationMono(const Mat image){
     // Declaration des variables
     int ligne, colonne ;                                    // Indices
@@ -198,7 +198,7 @@ Mat ImageRehaussementContraste(const Mat image, const int choix){
 
 //////////////////// Debruitage ////////////////////
 
-// Debruitage par filtre median pour une image en niveau gris
+// Debruitage par filtre median pour une image en niveau de gris
 Mat ImageMedianMono(const Mat image){
     // Declaraton des variables
     int ligne, colonne, lig, col ;                      // Indices
@@ -278,7 +278,7 @@ Mat ImageContourGradient(const Mat image){
     Mat gradientX, gradientY ;                              // Gradients en x et en y
     Mat imageContour(image.size(), CV_8U) ;                 // Image resultante
 
-    // Verifier si l'image de depart est en niveau gris
+    // Verifier si l'image de depart est en niveau de gris
     if(nbComposante > 1){
         imageContour = ImageMonochrome(image) ;
     }
@@ -299,7 +299,7 @@ Mat ImageContourGradient(const Mat image){
 
 // Detection de contours par filtre laplacien
 Mat ImageContourLaplace(const Mat image){
-   	return ImageSeuillage(ImageConvolution(ImageMonochrome(image), GenererFiltre(2)),200,250) ;
+   	return ImageConvolution(ImageMonochrome(image), GenererFiltre(2)) ;
 }
 
 // Detection de contours
@@ -347,7 +347,7 @@ Mat ImageRehaussementContour(const Mat image, const int val, const int choix){
 
 //////////////////// Seuillage ////////////////////
 
-// Seuillage d'une image en niveau gris
+// Seuillage d'une image en niveau de gris
 Mat ImageSeuillage(const Mat image, const int seuil){
     // Declaration des ariables
     int ligne, colonne ;                        // Indice
@@ -392,7 +392,7 @@ Mat ImageSeuillage(const Mat image, vector<int> seuil){
     return imageSeuillage ;
 }             
 
-// Seuillage par hysteresis d'une image en niveau gris
+// Seuillage par hysteresis d'une image en niveau de gris
 Mat ImageSeuillage(const Mat image, const int seuilBas, const int seuilHaut){
     return (ImageSeuillage(image, seuilBas) - ImageSeuillage(image, seuilHaut)) ;
 }       
@@ -421,6 +421,7 @@ Mat ImageSeuillage(const Mat image){
     cout << "Quel type de seuillage voulez-vous effectuer ?" << endl ;
     cout << "1. Seuillage simple" << endl ;
     cout << "2. Seuillage par hysteresis" << endl ;
+    cout << "Votre choix : " ;
     // Saisie et verification
     do{
         validation = true ;
@@ -442,10 +443,10 @@ Mat ImageSeuillage(const Mat image){
     // Seuillage simple
         case 1 :
             // Si l'image est en niveau de gris
-            if((int)image.depth() == 0){
+            if(VerifierImage(image, imageSeuillage)){
                 cout << "Veuillez saisir la valeur du seuil : " ;
                 SaisirSeuil(valTemp1) ;
-                imageSeuillage = ImageSeuillage(image, valTemp1) ; 
+                imageSeuillage = ImageSeuillage(imageSeuillage, valTemp1) ;     
             // Si m'image est en couleurs
             }else{
                 // Saisie du seuil de la composante bleue
@@ -453,34 +454,34 @@ Mat ImageSeuillage(const Mat image){
                 SaisirSeuil(valTemp1) ;
                 seuilBas.push_back(valTemp1) ;
                 // Saisie du seuil de la composante verte
-                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
-                SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;
-                // Saisie du seuil de la composante rouge
                 cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
                 SaisirSeuil(valTemp1) ;
                 seuilBas.push_back(valTemp1) ;
+                // Saisie du seuil de la composante rouge
+                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ;    
                 imageSeuillage = ImageSeuillage(image, seuilBas) ;     
-
             }    
-                               
+                           
             break ;
         // Seuillage par hysteresis
         case 2 :
             // Si l'image est en niveau de gris
-            if((int)image.depth() == 0){
+            if(VerifierImage(image, imageSeuillage)){
                 // Saisie et verification des seuils
                 SaisirSeuil(valTemp1, valTemp2) ;
-                imageSeuillage = ImageSeuillage(image, valTemp1, valTemp2) ;
+                // Seuillage
+                imageSeuillage = ImageSeuillage(imageSeuillage, valTemp1, valTemp2) ;     
             // Si m'image est en couleurs
             }else{
                 // Seuils pour la composante bleue
-                cout << "Seuils pour la composante rouge" << endl ;
+                cout << "Seuils pour la composante bleue" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
                 seuilHaut.push_back(valTemp2) ;                
                 // Seuils pour la composante verte
-                cout << "Seuils pour la composante rouge" << endl ;
+                cout << "Seuils pour la composante verte" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
                 seuilHaut.push_back(valTemp2) ;    
@@ -488,10 +489,10 @@ Mat ImageSeuillage(const Mat image){
                 cout << "Seuils pour la composante rouge" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ; 
-                imageSeuillage = ImageSeuillage(image, seuilBas, seuilHaut) ;                   
-            }      
-                                         
+                seuilHaut.push_back(valTemp2) ;  
+                // Seuillage        
+                imageSeuillage = ImageSeuillage(image, seuilBas, seuilHaut) ;               
+            }                   
             break ;
         default :
             break ;
@@ -503,7 +504,7 @@ Mat ImageSeuillage(const Mat image){
 
 //////////////////// Segmentation ////////////////////
 
-// Segmentation d'une image en niveau gris par seuillage simple
+// Segmentation d'une image en niveau de gris par seuillage simple
 Mat ImageSegmentation(const Mat image, const int seuil){
     // Declaration des variables
     int ligne, colonne ;
@@ -545,7 +546,7 @@ Mat ImageSegmentation(const Mat image, vector<int> seuil){
     return imageSegmentee ;    
 }
 
-// Segmentation d'une image en niveau gris par seuillage hysteresis
+// Segmentation d'une image en niveau de gris par seuillage hysteresis
 Mat ImageSegmentation(const Mat image, const int seuilBas, const int seuilHaut){
     return (ImageSegmentation(image, seuilBas) - ImageSegmentation(image, seuilHaut)) ;    
 }           
@@ -573,6 +574,7 @@ Mat ImageSegmentation(const Mat image){
     cout << "Quel type de seuillage voulez-vous effectuer ?" << endl ;
     cout << "1. Seuillage simple" << endl ;
     cout << "2. Seuillage par hysteresis" << endl ;
+    cout << "Votre choix : " ;
     // Saisie et verification
     do{
         validation = true ;
@@ -595,10 +597,11 @@ Mat ImageSegmentation(const Mat image){
     // Seuillage simple
         case 1 :
             // Si l'image est en niveau de gris
-            if((int)image.depth() == 0){
+            if(VerifierImage(image, imageSegmentation)){
                 cout << "Veuillez saisir la valeur du seuil : " ;
                 SaisirSeuil(valTemp1) ;
-                imageSegmentation = ImageSegmentation(image, valTemp1) ;
+                // Segmentation 
+                imageSegmentation = ImageSegmentation(imageSegmentation, valTemp1) ;              
             // Si m'image est en couleurs
             }else{
                 // Saisie du seuil de la composante bleue
@@ -606,34 +609,34 @@ Mat ImageSegmentation(const Mat image){
                 SaisirSeuil(valTemp1) ;
                 seuilBas.push_back(valTemp1) ;
                 // Saisie du seuil de la composante verte
-                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
-                SaisirSeuil(valTemp1) ;
-                seuilBas.push_back(valTemp1) ;
-                // Saisie du seuil de la composante rouge
                 cout << "Veuillez saisir la valeur du seuil de la composante verte : " ;
                 SaisirSeuil(valTemp1) ;
                 seuilBas.push_back(valTemp1) ;
-                imageSegmentation = ImageSegmentation(image, seuilBas) ;    
-
+                // Saisie du seuil de la composante rouge
+                cout << "Veuillez saisir la valeur du seuil de la composante rouge : " ;
+                SaisirSeuil(valTemp1) ;
+                seuilBas.push_back(valTemp1) ; 
+                // Segmentation   
+                imageSegmentation = ImageSegmentation(image, seuilBas) ;              
             }    
-                                
             break ;
         // Seuillage par hysteresis
         case 2 :
             // Si l'image est en niveau de gris
-            if((int)image.depth() == 0){
+            if(VerifierImage(image, imageSegmentation)){
                 // Saisie et verification des seuils
                 SaisirSeuil(valTemp1, valTemp2) ;
-                imageSegmentation = ImageSegmentation(image, valTemp1, valTemp2) ; 
+                // Segmentation
+                imageSegmentation = ImageSegmentation(imageSegmentation, valTemp1, valTemp2) ;                 
             // Si m'image est en couleurs
             }else{
                 // Seuils pour la composante bleue
-                cout << "Seuils pour la composante rouge" << endl ;
+                cout << "Seuils pour la composante bleue" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
                 seuilHaut.push_back(valTemp2) ;                
                 // Seuils pour la composante verte
-                cout << "Seuils pour la composante rouge" << endl ;
+                cout << "Seuils pour la composante verte" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
                 seuilHaut.push_back(valTemp2) ;    
@@ -641,10 +644,11 @@ Mat ImageSegmentation(const Mat image){
                 cout << "Seuils pour la composante rouge" << endl ;
                 SaisirSeuil(valTemp1, valTemp2) ;
                 seuilBas.push_back(valTemp1) ;
-                seuilHaut.push_back(valTemp2) ; 
-                imageSegmentation = ImageSegmentation(image, seuilBas, seuilHaut) ;                    
+                seuilHaut.push_back(valTemp2) ;     
+                // Segmentation               
+                imageSegmentation = ImageSegmentation(image, seuilBas, seuilHaut) ;                 
             }      
-                                        
+                        
             break ;
         default :
             break ;
@@ -773,7 +777,7 @@ vector<int> Histogramme(const Mat image, const int nbIntervalle){
     return occurence ;
 }
 
-// Egalisation de l'histogramme d'une image au niveau gris
+// Egalisation de l'histogramme d'une image au niveau de gris
 vector<int> Egalisation(const Mat image, const int nbIntervalle){
     // Declaration des variables
     int c ;                                                         // Indice   
@@ -1013,6 +1017,30 @@ int VecteurMedian(vector<int> vecteur){
     // Retour
     return vecteurDecroissant[ceil((double)vecteurDecroissant.size()/2)] ;
 }
+
+// Verifier l'egalite entre deux matrices de memes dimensions
+bool MatriceEgale(const Mat matrice1, const Mat matrice2){
+    // Declaration des variables
+    int ligne, colonne ;        // Indices
+    bool egal ;                 // Egalite entre deux matrices
+
+    // Verification de l'egalite de toutes les valeurs dans les deux matrices
+    for(ligne = 0 ; ligne < (int)matrice1.size().height ; ligne++){
+        for(colonne = 0 ; colonne < (int)matrice1.size().width ; colonne++){
+            if(matrice1.at<unsigned char>(ligne, colonne) == matrice2.at<unsigned char>(ligne, colonne)){
+                egal = true ;
+            }else{
+                egal = false ;
+                return egal ;
+                break ;
+            }
+        }
+    }
+
+    // Retour
+    return egal ;
+}     
+
 
 //////////////////// Autres ////////////////////
 
@@ -1340,7 +1368,7 @@ Mat GenererFiltre(const int typeFiltre){
     }
 }
 
-// Concatener 2 images de memes dimensions en 1 image (en niveau gris)
+// Concatener 2 images de memes dimensions en 1 image (en niveau de gris)
 Mat ConcatenerImageMono(Mat image1, Mat image2){
     // Declaration des variables
     int ligne, colonne ;                                // Indices
@@ -1517,7 +1545,8 @@ Mat plot_histogram(Mat image) {
      Mat histogram_image_G(400, 512, CV_8UC3, Scalar(0, 0, 0));
      Mat histogram_image_B(400, 512, CV_8UC3, Scalar(0, 0, 0));
      Mat histogram_image(400, 512, CV_8UC3, Scalar(0, 0, 0));
-    if (image.channels()==1){
+     Mat imageTemp;
+    if (VerifierImage(image,imageTemp)){
     return plot_histogram1D(image,1);
     }else {
         histogram_image_R = plot_histogram1D(ImageExtractionCouleur(image,1),1) ;
@@ -1529,6 +1558,35 @@ Mat plot_histogram(Mat image) {
         histogram_image_B,0.5,0.0,histogram_image);
     }
     return histogram_image;
+}
+// Verifier si l'image est en couleurs ou en niveau de gris
+bool VerifierImage(const Mat image, Mat& imageVerifiee){
+    // Declaration des variables
+    bool imageNiveauGris ;          // Verification si l'image est en niveau de gris
+    vector<Mat> composante ;        // Composantes de couleur de l'image
+
+    // Si l'image contient une seule composante
+    if(image.channels() == 1){
+        // L'image est en niveau de gris
+        imageVerifiee = image ;
+        imageNiveauGris = true ;
+    // Si l'image contient plusieurs composantes
+    }else{
+        // Decomposer l'image en composantes
+        split(image, composante) ;
+        // Si les trois composantes sont egales
+        if(MatriceEgale(composante[0], composante[1]) && MatriceEgale(composante[1], composante[2])){
+            imageVerifiee = composante[0] ;
+            imageNiveauGris = true ;
+        // Sinon : image en couleurs
+        }else{
+            imageVerifiee = image ;
+            imageNiveauGris = false ;
+        }
+    }
+
+    // Retour
+    return imageNiveauGris ;
 }
 
 

@@ -45,6 +45,7 @@ class Bibliotheque{
         void AjouterImage() ;                                                           // Ajouter une image dans la bibliotheque
         void SupprimerImage() ;                                                         // Supprimer une image de la bibliotheque
         void Sauvegarder() ;                                                            // Sauvegarder une bibliotheque
+        Json::Value majBiblioSuivantDroitAcces(const bool droitAcces) ;                 // Creer une sous-bibliotheque avec les images correspondantes au droit d'utilisateur
 
         /*Methodes supplementaires*/
         int ConstruireAfficherSousListeCout(const int choix) ;                          // Construire et afficher une sous-liste en fonction du cout (4 premieres options)

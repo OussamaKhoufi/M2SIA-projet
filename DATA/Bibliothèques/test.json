@@ -1,7 +1,7 @@
 {
    "images" : [
       {
-         "acces" : "P",
+         "acces" : "R",
          "cheminAcces" : "./DATA/Images/dangerous_dance.png",
          "cout" : 1000,
          "dateAjout" : "18/12/2021",
@@ -22,6 +22,7 @@
       },
       {
          "acces" : "P",
+<<<<<<< HEAD
          "cheminAcces" : "./DATA/Images/lena.png",
          "cout" : 69,
          "dateAjout" : "10/01/2021",
@@ -62,4 +63,36 @@
       }
    ],
    "nbImages" : 6
+=======
+         "cheminAcces" : "./DATA/Images/lena.pgm",
+         "cout" : 100,
+         "dateAjout" : "18/12/2021",
+         "dateCreation" : "08/10/2004",
+         "numero" : 3,
+         "source" : "Playboy",
+         "titre" : "Lena"
+      }, 
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/mon_carre.bmp",
+         "cout" : 100,
+         "dateAjout" : "18/12/2021",
+         "dateCreation" : "08/10/2004",
+         "numero" : 4,
+         "source" : "TP",
+         "titre" : "Carre"
+      },
+      {
+         "acces" : "P",
+         "cheminAcces" : "./DATA/Images/Seeds.png",
+         "cout" : 69,
+         "dateAjout" : "18/12/2021",
+         "dateCreation" : "08/10/2004",
+         "numero" : 5,
+         "source" : "TP",
+         "titre" : "Seeds"
+      }                    
+   ],
+   "nbImages" : 5
+>>>>>>> features-complement
 }
