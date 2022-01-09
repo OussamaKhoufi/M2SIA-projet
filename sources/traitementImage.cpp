@@ -321,45 +321,36 @@ Mat GenererFiltre(const int typeFiltre){
 }
 
 /*Transformée de Hough*/
-Mat TransformeedeHough(const Mat imgLines){
+Mat TransformeedeHough(const Mat image){
     Mat detectImgLines;
+    Mat detectImgCircles;
     Mat gray_image;
-    //Mat  detectImgLinescp;
-    imgLines.copyTo(detectImgLines); 
-   /* float rho, theta;
-    Point pt1, pt2;
-    double a,b;
-    double x0, y0;*/
+    Mat detectImgLinescp;
+    Mat image_Hough;
+
+    image.copyTo(detectImgLines);
+    image.copyTo(image_Hough);
+    
+    vector<Vec4i> linesP;
+    vector <Vec3f> circles;
+    
+
     // Niveau de gris
     gray_image = ImageNiveauGris(detectImgLines);    
-    //cvtColor(detectImgLines,gray_image,COLOR_RGB2GRAY);
     //Detection des contours
     Canny(gray_image,detectImgLines,200,255);
 
-   //cvtColor(detectImgLines,detectImgLinescp,COLOR_GRAY2BGR);
-    //vector <Vec2f> lines;
+  //
+    //Hough probabilist detection de droite
     
-    //Hough probabilist
-    vector<Vec4i> linesP;
     HoughLinesP(detectImgLines,linesP,1,CV_PI/180,50,50,10);
-    //HoughLines(detectImgLines,lines,1,CV_PI/180,150);
+    
+    //Création des droites
     for(size_t i = 0; i< linesP.size(); i++)
     {
         Vec4i l = linesP[i];
-        line(detectImgLines,Point(l[0],l[1]),Point(l[2],l[3]),(0,0,255),4,LINE_AA);
-      /*  rho = lines[i][0];
-        theta = lines[i][1];
-        a = cos(theta);
-        b = sin(theta);
-        x0 = a*rho;
-        y0 = b*rho;
-
-        pt1.x = cvRound(x0 + 1000*(-b));
-        pt1.y = cvRound(y0 + 1000*(a));
-        pt2.x = cvRound(x0 - 1000*(-b));
-        pt2.y = cvRound(y0 - 1000*(a));
-        line( detectImgLines, pt1, pt2, (0,0,255), 8, LINE_AA);*/
-    }
+        line(image_Hough,Point(l[0],l[1]),Point(l[2],l[3]),Scalar(0,0,255),4,LINE_AA);
+     } 
     
-    return detectImgLines;
+    return image_Hough;
 }
