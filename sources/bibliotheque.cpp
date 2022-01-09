@@ -18,18 +18,18 @@ Bibliotheque::Bibliotheque(){
     exist = experimental::filesystem::exists(nomNew) ;  
 
     // Vérifier l'existance ou non du fichier
-    if(exist){                                                              // Si le nom saisi existe
+    if(exist){                                                  // Si le nom saisi existe
         cout << "Fichier existant." << endl ;
 
-        Json::Reader reader ;                                               // Variable pour lire un fichie Json
-        ifstream bibliothequeFile(nomNew, ios::in) ;                        // Chargement du fichier Json
+        Json::Reader reader ;                                   // Variable pour lire un fichie Json
+        ifstream bibliothequeFile(nomNew, ios::in) ;            // Chargement du fichier Json
 
         // Verifier l'extension ".json"
         VerifierExtension(nomNew) ;
         // Lecture du fichier et copie du contenu dans la bibliotheque
         reader.parse(bibliothequeFile, _bibliotheque) ;    
 
-    }else{                                                                  // Sinon
+    }else{                                                      // Sinon
         cout << "Fichier inexistant. Generer une nouvelle bibliotheque." << endl ;
         AjouterImage() ;
     }
@@ -49,7 +49,7 @@ Bibliotheque::Bibliotheque(string nom){
     ifstream bibliothequeFile(nom, ios::in) ;   // Chargement du fichier Json
     reader.parse(bibliothequeFile, _bibliotheque) ; 
     _cheminJson = nom;                
-}
+}                               
 
 // Constructeur avec un objet Json
 Bibliotheque::Bibliotheque(const Json::Value bibliotheque){
@@ -509,6 +509,44 @@ void Bibliotheque::Sauvegarder(){
     }
     cout << "Bibliotheque sauvegardee." << endl ;
 }
+
+// Creer une sous-bibliotheque avec les images correspondantes au droit d'utilisateur
+Json::Value Bibliotheque::majBiblioSuivantDroitAcces(const bool droitAcces){
+    // Declaration des variables
+    int c, k ;                                      // Indices
+    Json::Value biblio = getBilbiotheque() ;        // Bibliotheque originale
+    Json::Value biblioAcces ;                       // Bibliotheque correspondante au droit de l'utilisateur
+    Json::Value removed ;                           // Parametre pour mettre a jour la bibliotheque apres l'enlevement d'un element
+    vector<int> numero ;                            // Vecteur des numeros des images a enlever
+
+    // Initialisation
+    biblioAcces = biblio ;
+    numero.clear() ;
+
+    // Si l'utilisateur n'a pas de droit d'acces
+    if(droitAcces == false){
+        // Determiner les numeros des images a enlever
+        for(c = 0 ; c < biblio["nbImages"].asInt() ; c++){
+            // Sauvegarder le numero des images a enlever dans le vecteur des numeros
+            if(biblio["images"][c]["acces"].asString() == "R"){
+                numero.push_back(biblio["images"][c]["numero"].asInt()) ;
+            }
+        }
+    }
+
+    // Enlever les images pour lesquelles leurs numeros sont ecrits dans le vecteur des numeros
+    for(c = 0 ; c < (int)numero.size() ; c++){
+        for(k = 0 ; k < biblioAcces["nbImages"].asInt() ; k++){
+            if(biblioAcces["images"][k]["numero"].asInt() == numero[c]){
+                biblioAcces["images"].removeIndex(k,  &removed) ;             
+                biblioAcces["nbImages"] = biblioAcces["nbImages"].asInt() - 1 ;
+            }
+        }
+    }
+
+    // Retour
+    return biblioAcces ;
+}                     
 
 /*Methodes supplementaires*/
 // Construire et afficher une sous-liste en fonction du cout (4 premieres options)
