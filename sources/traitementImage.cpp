@@ -332,7 +332,7 @@ Mat TransformeedeHough(const Mat image){
     image.copyTo(image_Hough);
     
     vector<Vec4i> linesP;
-    vector <Vec3f> circles;
+    //vector <Vec3f> circles;
     
 
     // Niveau de gris
@@ -354,3 +354,4 @@ Mat TransformeedeHough(const Mat image){
     
     return image_Hough;
 }
+
