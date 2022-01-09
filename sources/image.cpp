@@ -301,7 +301,7 @@ void Image::AfficherContenuImage(){
     string windowName = getTitre() ;                // Nom de la fenetre d'affichage    
 
     // Affichage
-    namedWindow(windowName, WINDOW_AUTOSIZE) ; 
+    namedWindow(windowName, WINDOW_NORMAL) ; 
     imshow(windowName, image);  
     waitKey(0) ; 
     destroyWindow(windowName) ; 
