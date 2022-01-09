@@ -788,14 +788,18 @@ void Image::TraitementImage(int choixTraitement){
         imageResultat = TransformHough(image) ;
         titreFigure = "Image apres Rehaussement de contours (Laplacien)" ;*/
         break;
+        case 16 : 
+        imageResultat = plot_histogram(image);
+        titreFigure = "Histogramme de l'image en niveau de gris" ;
+        break;
         default :
         cout << "Erreur choix Traitement d'images";
         break; 
     }
     
     // Affichage
-    imageResultat=ConcatenerImage(image,imageResultat);
-    namedWindow(titreFigure) ; 
+    //imageResultat=ConcatenerImage(image,imageResultat);
+    namedWindow(titreFigure,WINDOW_NORMAL) ; 
     imshow(titreFigure, imageResultat);  
     waitKey(0) ; 
     destroyWindow(titreFigure) ;

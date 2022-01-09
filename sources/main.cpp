@@ -12,6 +12,15 @@ void messagePasDroitAcces();
 
 int main (void){
 	lancerApp();
+	/*
+	Mat img = imread("./DATA/Images/dangerous_dance.png");
+	if (!img.data)
+    {
+        cout << "Image not loaded";
+        return -1;
+    }
+	cout << img.depth();
+	cout << endl << img.channels() << endl;*/
 	return 0 ;
 }
 void entreePourContinuer(){
@@ -100,6 +109,8 @@ void menuTraitementImage(Bibliotheque objBiblio,int numImage,bool droitAcces){
 		cout << endl << "14. Segmentation" << endl;
 		cout << endl << "**Detection de ligne**" << endl;
 		cout << endl << "15. Transformee de Hough" << endl;
+		cout << endl << "** Calcul d'Histogramme**" << endl;
+		cout << endl << "16. Afficher l'histogramme" << endl;
 		cout << endl << "0. Retour au menu Image" << endl;
 		cout << endl << "Veuillez saisir votre choix puis tapez sur Entrée : ";
 		cin >> stringSaisi;
@@ -285,6 +296,8 @@ void menuPrincipal(bool droitAcces){
 	}
 }
 void lancerApp(){
+
+
 	while(1){
 		int choix;
 		string stringSaisi;
@@ -310,3 +323,6 @@ void lancerApp(){
 		entreePourContinuer();		
     }
 }
+
+
+

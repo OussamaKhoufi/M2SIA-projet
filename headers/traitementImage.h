@@ -67,3 +67,6 @@ Mat ConcatenerImage(Mat image1, Mat image2) ;                           // Conca
 Mat MonoCouleur(const Mat image) ;                                      // Convertir le format d'une image monochrome en format RVB
 void SaisirSeuil(int& seuil) ;                                          // Saisie et verification de la valeur d'un seuil
 void SaisirSeuil(int& seuilBas, int& seuilHaut) ;                       // Saisie et verification des valeurs des seuils hysteresis
+Mat plot_histogram1D(Mat image,int choixCouleur) ;                                    // Image du Graphe Histogramme
+Mat calc_histogram(Mat image) ;                                           // Calcul d'histogramme
+Mat plot_histogram(Mat image) ;  
