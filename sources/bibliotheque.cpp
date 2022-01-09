@@ -360,24 +360,6 @@ template < typename Type > std::string to_str (const Type & t)
   return os.str ();
 }
 
-/*Affichage des messages*/
-void AffichageMessageSupprimer(char st){
-    switch (st)
-    {
-    // Accès
-    case 'A':
-        
-        break;
-    /*case '':
-        break;
-    */
-    default:
-        cout << "Acces (P : Publique, R : Restreint) : " ;
-        break;
-    }
-
-} 
-
 /*Ajouter une image*/
 void Bibliotheque::AjouterImage(){ 
     Json::Value biblio = getBilbiotheque() ; 
