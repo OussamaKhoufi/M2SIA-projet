@@ -185,7 +185,7 @@ void menuBibliotheque(Bibliotheque objBiblio,bool droitAcces){
 		int choix;
 		int numImage;
 		string stringSaisi ;
-		//objBiblio.majBiblioSuivantDroitAcces(droitAcces);
+		objBiblio.majBiblioSuivantDroitAcces(droitAcces);
 		cout << endl << "----------------------------------" << endl;
 		cout << endl << "---Menu Gestion de Bibliotheque---" << endl;
 		cout << endl << "----------------------------------" << endl;

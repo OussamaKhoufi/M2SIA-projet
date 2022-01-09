@@ -45,7 +45,7 @@ class Bibliotheque{
         void AjouterImage() ;                                                           // Ajouter une image dans la bibliotheque
         void SupprimerImage() ;                                                         // Supprimer une image de la bibliotheque
         void Sauvegarder() ;                                                            // Sauvegarder une bibliotheque
-        Json::Value majBiblioSuivantDroitAcces(const bool droitAcces) ;                 // Creer une sous-bibliotheque avec les images correspondantes au droit d'utilisateur
+        void majBiblioSuivantDroitAcces(const bool droitAcces) ;                 // Creer une sous-bibliotheque avec les images correspondantes au droit d'utilisateur
 
         /*Methodes supplementaires*/
         int ConstruireAfficherSousListeCout(const int choix) ;                          // Construire et afficher une sous-liste en fonction du cout (4 premieres options)
@@ -56,7 +56,7 @@ class Bibliotheque{
         vector<int> Trier(vector<string>valeurNonTri) ;                                 // Determiner les indices des elements avant le tri (chaine de caracteres)
         vector<int> Trier(vector<int>valeurNonTri) ;                                    // Determiner les indices des elements avant le tri (entier)
         bool VerifierBibliotheque() ;                                                   // Veriffier bibliotheque vide ou invalide
-        void majBiblioSuivantDroitAcces(/*bool droitAcces*/);                           // Mettre à jour la bibliotheque suivant le droit d'acces
+        
 };
 
 #endif // BIBLIOTHEQUE_H

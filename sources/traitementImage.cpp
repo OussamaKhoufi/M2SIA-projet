@@ -1547,11 +1547,11 @@ Mat plot_histogram(Mat image) {
      Mat histogram_image(400, 512, CV_8UC3, Scalar(0, 0, 0));
      Mat imageTemp;
     if (VerifierImage(image,imageTemp)){
-    return plot_histogram1D(image,1);
+    return plot_histogram1D(imageTemp,0);
     }else {
-        histogram_image_R = plot_histogram1D(ImageExtractionCouleur(image,1),1) ;
-        histogram_image_G = plot_histogram1D(ImageExtractionCouleur(image,2),2) ;
-        histogram_image_B = plot_histogram1D(ImageExtractionCouleur(image,3),3) ; 
+        histogram_image_R = plot_histogram1D(ImageExtractionCouleur(imageTemp,1),1) ;
+        histogram_image_G = plot_histogram1D(ImageExtractionCouleur(imageTemp,2),2) ;
+        histogram_image_B = plot_histogram1D(ImageExtractionCouleur(imageTemp,3),3) ; 
         addWeighted(histogram_image_R,0.5,
         histogram_image_G,0.5,0.0,histogram_image);
         addWeighted(histogram_image,0.5,

@@ -511,7 +511,7 @@ void Bibliotheque::Sauvegarder(){
 }
 
 // Creer une sous-bibliotheque avec les images correspondantes au droit d'utilisateur
-Json::Value Bibliotheque::majBiblioSuivantDroitAcces(const bool droitAcces){
+void Bibliotheque::majBiblioSuivantDroitAcces(const bool droitAcces){
     // Declaration des variables
     int c, k ;                                      // Indices
     Json::Value biblio = getBilbiotheque() ;        // Bibliotheque originale
@@ -544,8 +544,8 @@ Json::Value Bibliotheque::majBiblioSuivantDroitAcces(const bool droitAcces){
         }
     }
 
-    // Retour
-    return biblioAcces ;
+    
+    _bibliotheque = biblioAcces ;
 }                     
 
 /*Methodes supplementaires*/
@@ -893,11 +893,6 @@ vector<int> Bibliotheque::Trier(vector<int>valeurNonTri){
 
     // Retour
     return indice ;
-}
-
-/*Mettre a jour la bibliotheque suivant les droits d'acces*/
-void Bibliotheque::majBiblioSuivantDroitAcces(/*bool droitAcces*/){
-
 }
 
 // Veriffier bibliotheque vide ou invalide
