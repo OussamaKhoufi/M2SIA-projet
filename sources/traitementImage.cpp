@@ -321,37 +321,141 @@ Mat GenererFiltre(const int typeFiltre){
 }
 
 /*Transformée de Hough*/
-Mat TransformeedeHough(const Mat image){
-    Mat detectImgLines;
-    Mat detectImgCircles;
+// pas de tetha: num_theta the varie entre [1,180]. Quand c'est égale 1 tetha prend soit 0 ou 180.
+//... Qd c'est égale à 180, nous projetons à chaque degré à la fois
+//seuil : threshold_acc equivaut au seuille d'aceptation [0,500]
+//Mat TransformeedeHough(const Mat image){
+Mat TransformeedeHough(const Mat image,int num_theta,int threshold_acc){
     Mat gray_image;
-    Mat detectImgLinescp;
-    Mat image_Hough;
+    Mat edge_image;
+    Mat accumulateur;
+    Mat imageHough;
+    
+    int edge_width,edge_height;
+    double edge_height_half, edge_width_half;
+    
+    double dtheta;
+    double *thetas;
+    int theta_idx;
 
-    image.copyTo(detectImgLines);
-    image.copyTo(image_Hough);
+    double rho;
+    int rho_idx;
+    int Max_rho;
+    int Maxrho_idx; //index maximal de rho
     
-    vector<Vec4i> linesP;
-    //vector <Vec3f> circles;
-    
+    double* cos_theta;
+    double* sin_theta;
+    double deg2rad;
+    // défini le nombre de point pour discrétiser les rho et théta
+    //int num_theta =180;
+    //int threshold_acc = 80; //Seuillage
 
-    // Niveau de gris
-    gray_image = ImageNiveauGris(detectImgLines);    
-    //Detection des contours
-    Canny(gray_image,detectImgLines,200,255);
+    int ligne,colonne;
+    
+    
+    Point pt1, pt2;
+    
+    image.copyTo(imageHough);
+    
+    //Allocation dynamique
+    cos_theta = new double[num_theta];
+    sin_theta = new double [num_theta];
+    thetas = new double [num_theta];
+    
+    // Mettre l'image en niveau de gris
+    gray_image = ImageNiveauGris(image);
+    
+    // Detection des contours
+    Canny(gray_image,edge_image,200,255);
+    
+    //taille de l'image suite à la détention d'un contour
+    edge_width = edge_image.cols; // largeur de l'image
+    edge_height = edge_image.rows; // hauteur de l'image
+    edge_width_half = edge_width / 2;  // mi- largeur de l'image 
+    edge_height_half = edge_height / 2; // mi- hauteur de l'image 
+    
+    
+    // Iniatilisation des pas de theta et de rho
+    //rho varie entre 0 et la diagonale de l'image
+    Max_rho = round(sqrt(edge_width*edge_width + edge_height*edge_height));
+    Maxrho_idx = 2*Max_rho+1;
+    
+    dtheta = (double)180/ num_theta;
+    deg2rad = CV_PI /180; // conversion des degré en radian
 
-  //
-    //Hough probabilist detection de droite
-    
-    HoughLinesP(detectImgLines,linesP,1,CV_PI/180,50,50,10);
-    
-    //Création des droites
-    for(size_t i = 0; i< linesP.size(); i++)
-    {
-        Vec4i l = linesP[i];
-        line(image_Hough,Point(l[0],l[1]),Point(l[2],l[3]),Scalar(0,0,255),4,LINE_AA);
-     } 
-    
-    return image_Hough;
-}
+    // Discrétisation de théta et calcul de cos(theta), sin(theta)
+    for(theta_idx=0;theta_idx<num_theta;theta_idx++){
+        thetas [theta_idx] = theta_idx*dtheta;
+        //cout << "valeur de theta : " << thetas [theta_idx]<<endl;
 
+        //Calcule des cos(theta) et sinus(thetas) en radian;
+        cos_theta [theta_idx] = cos(deg2rad*thetas [theta_idx]);
+        sin_theta [theta_idx] = sin(deg2rad*thetas [theta_idx]);
+    }
+
+
+    //Création de l'accumulateur and initialiser à ZEro
+    accumulateur = Mat::zeros(Maxrho_idx,num_theta,CV_8U);
+  
+    // Calcul dans l'espace de Hough
+    for (ligne = 0;ligne < edge_height; ligne ++){
+        for(colonne = 0; colonne < edge_width; colonne ++){
+            //détection des pixel ayant une valeur différent de 0
+            if (edge_image.at<unsigned char>(ligne,colonne)!=0){
+                
+                
+                for(theta_idx = 0; theta_idx < num_theta; theta_idx ++){
+                    
+                    rho = (colonne - edge_width_half) * cos_theta[theta_idx] +  (ligne - edge_height_half) * sin_theta[theta_idx];
+                    rho_idx = round(rho)+Max_rho;
+                    //cout << "valeur de rho" << rho<< "valeur de lindex "<< rho_idx<< endl;
+                    //cout << index_Rho << endl;
+                    accumulateur.at<unsigned char>(rho_idx,theta_idx)++;
+                    
+                }
+            }
+        }
+
+    }
+    
+    //Tracage ds droite détecter à partir de l'accumulateur
+    for (ligne = 0;ligne < accumulateur.rows; ligne ++){
+        for(colonne = 0; colonne < accumulateur.cols; colonne ++){ 
+            if(accumulateur.at<unsigned char>(ligne,colonne) > (threshold_acc)){
+                
+                //y = (r - x cos(t)) / sin(t) 
+                if(thetas[colonne] >= 45 && thetas[colonne] <= 135){
+                    pt1.x = 0;
+                    pt1.y =((double)(ligne-Max_rho) - ((pt1.x - (edge_width_half) ) * cos_theta [colonne])) / sin_theta [colonne] + (edge_height_half);
+                    pt2.x = edge_width;
+                    pt2.y = ((double)(ligne-Max_rho) - ((pt2.x - (edge_width_half) ) * cos_theta [colonne])) / sin_theta [colonne] + (edge_height_half);              
+                    
+               }
+                
+                //x = (r - y sin(t)) / cos(t);
+                else{
+                    
+                    pt1.y = 0;
+                    pt1.x = ((double)(ligne-Max_rho) - ((pt1.y - (edge_height_half) ) * sin_theta [colonne])) /cos_theta [colonne] + (edge_width_half);
+                    pt2.y = edge_height;
+                    pt2.x = ((double)(ligne-Max_rho) - ((pt2.y - (edge_height_half) ) * sin_theta [colonne])) / cos_theta [colonne] + (edge_width_half);
+                    
+                }
+ 
+                line( imageHough, pt1, pt2, Scalar(0,0,255), 2, LINE_AA);
+                
+            }
+
+        }
+
+    }
+    
+    //liberation de la mémoire
+    delete (cos_theta);
+    delete (sin_theta);
+    delete (thetas);
+    
+    //cout << accumulateur << endl;
+    
+    return imageHough;
+   }
